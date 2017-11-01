@@ -36,9 +36,10 @@ class manager_test extends advanced_testcase {
 
     /**
      * Add exam works as expected.
+     * 
      * @global \moodle_database $DB
      */
-    public function test_add_exammode() {
+    public function test_add_exammode() {        
         $this->resetAfterTest();
 
         $from = time() - 3600;
@@ -53,13 +54,20 @@ class manager_test extends advanced_testcase {
         $manager = local_exammode\manager::get_instance();
         $manager->add_exammode($exammode);
 
+        $this->assertNotNull($exammode->get_id());
+
         global $DB;
         $dbrec = $DB->get_record('local_exammode', array(
-            'courseid' => $this->course->id
+            'id' => $exammode->get_id()
         ));
 
-        $this->assertEquals($from, $dbrec->from);
-        $this->assertEquals($to, $dbrec->to);
+        $this->assertEquals($from, $dbrec->timefrom);
+        $this->assertEquals($to, $dbrec->timeto);
         $this->assertEquals($this->course->id, $dbrec->courseid);
-    }
+   }
+
+   public function test_get_exammode() {
+       
+   }
+
 }

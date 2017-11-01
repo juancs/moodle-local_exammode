@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Extends the navigation node.
+ * Manage exam mode for a course.
  *
  * @package    local_exammode
  * @copyright  2017 Universitat Jaume I (https://www.uji.es/)
@@ -23,27 +23,28 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+require_once(dirname(__FILE__) . '/../../config.php');
 
-function local_exammode_extend_navigation_course(navigation_node $navigation, $course, $context) {
-    global $CFG;
+$courseid = required_param('courseid', PARAM_INT);
 
-    if (has_capability('local/exammode:manage', $context)) {
-        $cat = $navigation->create(
-                get_string('exammode', 'local_exammode'),
-                null,
-                navigation_node::TYPE_CATEGORY
-        );
-        $navigation->add_node($cat);
+require_login($courseid);
 
-        $node = $cat->create(
-            get_string('manageexammode', 'local_exammode'),
-            new moodle_url($CFG->wwwroot . '/local/exammode/manage.php', array('courseid' => $course->id)),
-            global_navigation::TYPE_SETTING,
-            null,
-            "manageexammode",
-            new pix_icon('e/question', get_string('manageexammode', 'local_exammode'))
-        );
-        $cat->add_node($node);
-    }
-}
+$context = context_course::instance($courseid);
+require_capability('local/exammode:manage', $context);
+
+$course = $DB->get_record('course', array('id' => $courseid));
+
+$PAGE = new moodle_page();
+$PAGE->set_context($context);
+$PAGE->set_course($course);
+$PAGE->set_url($CFG->wwwroot . '/local/exammode/manage.php', array('courseid' => $courseid));
+
+$PAGE->set_heading("Manage Exam Mode");
+$PAGE->set_title("Manage Exam Modes");
+
+$output = $PAGE->get_renderer('local_exammode');
+echo $output->header();
+
+
+
+echo $output->footer();

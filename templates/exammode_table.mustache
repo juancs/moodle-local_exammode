@@ -1,0 +1,26 @@
+{{!
+    @template local_exammode/exammode_table
+
+    A table representing the scheduled exammode tables.
+
+    Context variables:
+    * exammodes. An array of exammodes.
+}}
+<table class="table table-responsive">
+    <thead>
+        <tr>
+            <th>{{#str}} timefrom, local_exam{{/str}}</th>
+            <th>{{#str}} timeto, local_exam{{/str}}</th>
+            <th>{{#str}} actions, local_exam{{/str}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#exammodes}}
+            <th>
+                <td>{{timefrom}}</td>
+                <td>{{timeto}}</td>
+                <td>{{actions}}</td>
+            </th>
+        {{/exammodes}}
+    </tbody>
+</table>

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Extends the navigation node.
+ * The renderer.
  *
  * @package    local_exammode
  * @copyright  2017 Universitat Jaume I (https://www.uji.es/)
@@ -25,25 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-function local_exammode_extend_navigation_course(navigation_node $navigation, $course, $context) {
-    global $CFG;
+class local_exammode_renderer extends plugin_renderer_base {
 
-    if (has_capability('local/exammode:manage', $context)) {
-        $cat = $navigation->create(
-                get_string('exammode', 'local_exammode'),
-                null,
-                navigation_node::TYPE_CATEGORY
-        );
-        $navigation->add_node($cat);
 
-        $node = $cat->create(
-            get_string('manageexammode', 'local_exammode'),
-            new moodle_url($CFG->wwwroot . '/local/exammode/manage.php', array('courseid' => $course->id)),
-            global_navigation::TYPE_SETTING,
-            null,
-            "manageexammode",
-            new pix_icon('e/question', get_string('manageexammode', 'local_exammode'))
-        );
-        $cat->add_node($node);
-    }
 }
+

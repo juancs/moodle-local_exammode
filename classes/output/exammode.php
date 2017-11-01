@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,7 +16,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Extends the navigation node.
+ * Output exammode.
  *
  * @package    local_exammode
  * @copyright  2017 Universitat Jaume I (https://www.uji.es/)
@@ -23,27 +24,27 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_exammode\output;
+
 defined('MOODLE_INTERNAL') || die();
 
-function local_exammode_extend_navigation_course(navigation_node $navigation, $course, $context) {
-    global $CFG;
+class exammode implements \templatable, \renderable {
+    
+    /**
+     * The exammode to show.
+     *
+     * @var \local_exammode\objects\exammode 
+     */
+    private $exammode;
 
-    if (has_capability('local/exammode:manage', $context)) {
-        $cat = $navigation->create(
-                get_string('exammode', 'local_exammode'),
-                null,
-                navigation_node::TYPE_CATEGORY
+    public function __construct(\local_exammode\objects\exammode $exammode) {
+        $this->exammode = $exammode;
+    }
+    public function export_for_template(\renderer_base $output) {
+        return array(
+            'timefrom' => usergetdate($this->exammode->get_from()),
+            'timeto' => usergetdate($this->exammode->get_to()),
+            'actions' => '1 2 3'
         );
-        $navigation->add_node($cat);
-
-        $node = $cat->create(
-            get_string('manageexammode', 'local_exammode'),
-            new moodle_url($CFG->wwwroot . '/local/exammode/manage.php', array('courseid' => $course->id)),
-            global_navigation::TYPE_SETTING,
-            null,
-            "manageexammode",
-            new pix_icon('e/question', get_string('manageexammode', 'local_exammode'))
-        );
-        $cat->add_node($node);
     }
 }

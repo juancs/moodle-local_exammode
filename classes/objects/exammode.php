@@ -31,8 +31,8 @@ class exammode {
 
     private $id;
     private $courseid;
-    private $from;
-    private $to;
+    private $timefrom;
+    private $timeto;
 
     /**
      * Given a dbrecord from local_exammode gets an instance of exammode.
@@ -46,19 +46,19 @@ class exammode {
         );
     }
 
-    public function __construct($id, $courseid, $from, $to) {
+    public function __construct($id, $courseid, $timefrom, $timeto) {
         $this->id = ($id === null) ? null : (int) $id;
         $this->courseid = (int) $courseid;
-        $this->from = (int) $from;
-        $this->to = (int) $to;
+        $this->timefrom = (int) $timefrom;
+        $this->timeto = (int) $timeto;
     }
 
     public function to_db_record() {
         $ret = new \stdClass();
         $ret->id = $this->id;
         $ret->courseid = (int) $this->courseid;
-        $ret->from = (int) $this->from;
-        $ret->to = (int) $this->to;
+        $ret->timefrom = (int) $this->timefrom;
+        $ret->timeto = (int) $this->timeto;
         return $ret;
     }
 
@@ -70,14 +70,6 @@ class exammode {
         return $this->courseid;
     }
 
-    public function get_from() {
-        return $this->from;
-    }
-
-    public function get_to() {
-        return $this->to;
-    }
-
     public function set_id($id) {
         $this->id = $id;
     }
@@ -86,12 +78,19 @@ class exammode {
         $this->courseid = $courseid;
     }
 
-    public function set_from($from) {
+    function get_from() {
+        return $this->from;
+    }
+
+    function get_to() {
+        return $this->to;
+    }
+
+    function set_from($from) {
         $this->from = $from;
     }
 
-    public function set_to($to) {
+    function set_to($to) {
         $this->to = $to;
     }
-
 }

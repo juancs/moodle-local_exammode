@@ -8,15 +8,15 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="from" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The time when the exam mode must start."/>
-        <FIELD NAME="to" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="A unix timestamp representing the end datetime when the exam mode should finish."/>
+        <FIELD NAME="timefrom" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The time when the exam mode must start."/>
+        <FIELD NAME="timeto" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="A unix timestamp representing the end datetime when the exam mode should finish."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="course_fk" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="from-to" UNIQUE="false" FIELDS="from, to"/>
+        <INDEX NAME="timefrom-timeto" UNIQUE="false" FIELDS="timefrom, timeto"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="local_exammode_user" COMMENT="Users that have accepted to enter the exammode">
