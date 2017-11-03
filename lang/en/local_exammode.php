@@ -27,3 +27,8 @@ $string['exammode'] = 'Exam Mode';
 $string['exammode:manage'] = 'Allows to put a course into exam mode';
 $string['manageexammode'] = 'Manage Exam Mode';
 $string['pluginname'] = 'Exam Mode';
+
+$string['timefrom'] = 'Start';
+$string['timeto'] = 'End';
+$string['actions'] = 'Actions';
+

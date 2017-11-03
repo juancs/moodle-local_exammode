@@ -42,7 +42,7 @@ class exammode {
      */
     public static function to_exammode($dbrec) {
         return new self(
-            $dbrec->id, $dbrec->courseid, $dbrec->from, $dbrec->to
+            $dbrec->id, $dbrec->courseid, $dbrec->timefrom, $dbrec->timeto
         );
     }
 
@@ -79,18 +79,18 @@ class exammode {
     }
 
     function get_from() {
-        return $this->from;
+        return $this->timefrom;
     }
 
     function get_to() {
-        return $this->to;
+        return $this->timeto;
     }
 
     function set_from($from) {
-        $this->from = $from;
+        $this->timefrom = $from;
     }
 
     function set_to($to) {
-        $this->to = $to;
+        $this->timeto = $to;
     }
 }

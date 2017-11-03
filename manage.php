@@ -26,6 +26,7 @@
 require_once(dirname(__FILE__) . '/../../config.php');
 
 $courseid = required_param('courseid', PARAM_INT);
+$action = optional_param('action', 'view', PARAM_ALPHA);
 
 require_login($courseid);
 
@@ -37,14 +38,47 @@ $course = $DB->get_record('course', array('id' => $courseid));
 $PAGE = new moodle_page();
 $PAGE->set_context($context);
 $PAGE->set_course($course);
-$PAGE->set_url($CFG->wwwroot . '/local/exammode/manage.php', array('courseid' => $courseid));
+$PAGE->set_url(new \moodle_url('/local/exammode/manage.php', array('courseid' => $courseid)));
 
 $PAGE->set_heading("Manage Exam Mode");
 $PAGE->set_title("Manage Exam Modes");
 
+$manager = local_exammode\manager::get_instance();
+
 $output = $PAGE->get_renderer('local_exammode');
 echo $output->header();
 
+if ($action === 'delete') {
+    $examid = required_param('examid', PARAM_INT);
+    $sesskey = optional_param('sesskey', null, PARAM_RAW);
+    if (!$sesskey) {
+        echo $output->confirm(
+            get_string('confirmdelete', 'local_exammode'),
+            new \moodle_url(
+                '/local/exammode/manage.php',
+                array('action' => 'delete', 'courseid' => $courseid, 'examid' => $examid, 'sesskey' => sesskey())
+            ),
+            new \moodle_url(
+                '/local/exammode/manage.php',
+                array('action' => 'view', 'courseid' => $courseid)
+            )
+        );
+        echo $output->footer();
+        die;
+    }
+    
+    require_sesskey();
+    $manager->delete_exam($examid);
+}
 
+echo $output->heading("Scheduled exam modes", 2);
+
+$table = new local_exammode\output\examstable("examstable", $courseid);
+$table->setup();
+
+$exams = $manager->get_exams_for_course($courseid);
+
+$table->format_and_add_array_of_rows($exams, false);
+$table->finish_output();
 
 echo $output->footer();

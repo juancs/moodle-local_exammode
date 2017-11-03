@@ -32,12 +32,14 @@ require_once($CFG->libdir . '/tablelib.php');
 class examstable extends \flexible_table implements \renderable {
 
     private $calendar;
+    private $courseid;
 
-    public function __construct($uniqueid) {
+    public function __construct($uniqueid, $courseid) {
         parent::__construct($uniqueid);
 
         $this->calendar = \core_calendar\type_factory::get_calendar_instance();
-
+        $this->courseid = $courseid;
+        
         $this->define_columns(
             array(
                 'choose',
@@ -56,25 +58,54 @@ class examstable extends \flexible_table implements \renderable {
                 get_string('actions', 'local_exammode')
             )
         );
-        $this->define_baseurl(new \moodle_url('local/exammode/manage.php'));
+        $this->define_baseurl(new \moodle_url('/local/exammode/manage.php'));
         $this->pageable(true);
-        $this->sortable(true);
+        $this->sortable(false);
         $this->collapsible(false);
     }
 
-    protected function col_check($data) {
+    protected function col_choose($data) {
         return \html_writer::checkbox("algo", "valor", false);
     }
-
-    public function col_date(\local_exammode\objects\exammode $data) {
+    protected function col_date(\local_exammode\objects\exammode $data) {
         return userdate($data->get_from(), get_string('strftimedate', 'langconfig'));
-        
     }
-    public function col_timefrom($data) {
+    protected function col_timefrom($data) {
         return userdate($data->get_from(), get_string('strftimetime', 'langconfig'));
     }
-    public function col_timeto($data) {
+    protected function col_timeto($data) {
         return userdate($data->get_to(), get_string('strftimetime', 'langconfig'));
     }
+    /**
+     *
+     * @global \core_renderer $OUTPUT
+     * @param \local_exammode\objects\exammode $data
+     */
+    protected function col_actions($data) {
+        global $OUTPUT;
 
+        $ret = $OUTPUT->action_icon(
+            new \moodle_url(
+                '/local/exammode/edit.php',
+                array(
+                    'courseid' => $this->courseid,
+                    'action' => 'edit',
+                    'examid' => $data->get_id()
+                )
+            ),
+            new \pix_icon('i/edit', get_string('edit'))
+        );
+        $ret .= $OUTPUT->action_icon(
+            new \moodle_url(
+                '/local/exammode/manage.php',
+                array(
+                    'courseid' => $this->courseid,
+                    'action' => 'delete',
+                    'examid' => $data->get_id()
+                )
+            ),
+            new \pix_icon('i/delete', get_string('delete'))
+        );
+        return $ret;
+    }
 }

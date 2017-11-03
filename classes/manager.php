@@ -133,4 +133,35 @@ class manager {
         $em->set_id($id);
     }
 
+    /**
+     * Gets the exams scheduled for course.
+     * 
+     * @global \moodle_database $DB
+     * @param int $courseid
+     */
+    public function get_exams_for_course ($courseid, $sort = 'timefrom DESC') {
+        global $DB;
+        
+        $recs = $DB->get_records(
+            'local_exammode',
+            array('courseid' => $courseid),
+            $sort
+        );
+        
+        return array_map(function($r) {
+            return objects\exammode::to_exammode($r);
+        }, $recs);
+    }
+
+    /**
+     *
+     * @global \moodle_database $DB
+     * @param int $id
+     * @throws \dml_exception
+     */
+    public function delete_exam ($examid) {
+        global $DB;
+        $DB->delete_records('local_exammode', array('id' => $examid));
+    }
+
 }
