@@ -71,14 +71,13 @@ if ($action === 'delete') {
     $manager->delete_exam($examid);
 }
 
-echo $output->heading("Scheduled exam modes", 2);
-
-$table = new local_exammode\output\examstable("examstable", $courseid);
-$table->setup();
-
 $exams = $manager->get_exams_for_course($courseid);
 
-$table->format_and_add_array_of_rows($exams, false);
-$table->finish_output();
+$manage_page = new local_exammode\output\manage_page(
+    $courseid,
+    new \local_exammode\output\examstable("examstable", $courseid, $exams),
+    new \moodle_url("/local/exammode/manage.php")
+);
+echo $output->render($manage_page);
 
 echo $output->footer();

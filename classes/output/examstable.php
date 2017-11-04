@@ -33,12 +33,14 @@ class examstable extends \flexible_table implements \renderable {
 
     private $calendar;
     private $courseid;
+    private $exams;
 
-    public function __construct($uniqueid, $courseid) {
+    public function __construct($uniqueid, $courseid, $exams) {
         parent::__construct($uniqueid);
 
         $this->calendar = \core_calendar\type_factory::get_calendar_instance();
         $this->courseid = $courseid;
+        $this->exams = $exams;
         
         $this->define_columns(
             array(
@@ -64,6 +66,10 @@ class examstable extends \flexible_table implements \renderable {
         $this->collapsible(false);
     }
 
+    public function get_exams() {
+        return $this->exams;
+    }
+
     protected function col_choose($data) {
         return \html_writer::checkbox("algo", "valor", false);
     }
@@ -85,6 +91,18 @@ class examstable extends \flexible_table implements \renderable {
         global $OUTPUT;
 
         $ret = $OUTPUT->action_icon(
+            new \moodle_url(
+                '/local/exammode/edit.php',
+                array(
+                    'courseid' => $this->courseid,
+                    'action' => 'disable',
+                    'examid' => $data->get_id()
+                )
+            ),
+            new \pix_icon('i/hide', get_string('enable'))
+        );
+
+        $ret .= $OUTPUT->action_icon(
             new \moodle_url(
                 '/local/exammode/edit.php',
                 array(

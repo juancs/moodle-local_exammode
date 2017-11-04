@@ -23,6 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['confirmdelete'] = 'Are you sure you want to delete this exam?';
 $string['exammode'] = 'Exam Mode';
 $string['exammode:manage'] = 'Allows to put a course into exam mode';
 $string['manageexammode'] = 'Manage Exam Mode';
@@ -32,3 +33,9 @@ $string['timefrom'] = 'Start';
 $string['timeto'] = 'End';
 $string['actions'] = 'Actions';
 
+$string['scheduledexammodes'] = 'Scheduled exam modes';
+$string['scheduledexammodesdesc'] = 'You can manage the scheduled exam modes for this course. '
+        . 'Remember that an exam mode restricts what students can do during the period '
+        . 'of time defined.';
+
+$string['newexam'] = 'New exam';

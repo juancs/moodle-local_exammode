@@ -27,6 +27,24 @@ defined('MOODLE_INTERNAL') || die();
 
 class local_exammode_renderer extends plugin_renderer_base {
 
+    public function render_manage_page (local_exammode\output\manage_page $managepage) {
+        return $this->render_from_template(
+                'local_exammode/manage_page',
+                $managepage->export_for_template($this)
+        );
+    }
 
+    public function render_examstable (\local_exammode\output\examstable $examstable) {
+        ob_start();
+
+        $examstable->setup();
+        $examstable->format_and_add_array_of_rows($examstable->get_exams(), false);
+        $examstable->finish_output();
+
+        $table = ob_get_contents();
+        ob_end_clean();
+
+        return $table;
+    }
 }
 

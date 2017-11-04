@@ -1,0 +1,32 @@
+{{!
+    @template local_exammode/manage_page
+
+    Manages exam modes for a course.
+
+    Context variables:
+    * examstable. The table defined at local_exammode/output/examstable
+    * newexamurl. The url to add a new exam.
+    * courseid. The courseid.
+}}
+
+<div class="scheduled_exammodes">
+    <h1>{{#str}} scheduledexammodes, local_exammode {{/str}}</h1>
+
+    <p>{{#str}} scheduledexammodesdesc, local_exammode {{/str}}</p>
+
+    <div class="row">
+        <div class="col-12 col-lg-8">
+            <form action="{{newexamurl}}" method="get">
+                <input type="hidden" name="courseid" value="{{courseid}}" />
+                <input type="hidden" name="action" value="new" />
+                <input type="submit" class="btn btn-primary float-right" data-action="new" 
+                    value="{{#str}}newexam, local_exammode{{/str}}" />
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-lg-8">
+            {{{examstable}}}
+        </div>
+    </div>
+</div>
