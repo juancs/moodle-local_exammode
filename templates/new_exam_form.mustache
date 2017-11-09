@@ -1,0 +1,21 @@
+{{!
+    @template local_exammode/new_exam_form
+    
+    A template for the new exam form
+
+    Context variables:
+
+}}
+
+<form class="local-exam-newform">
+    <label for="date" class="form-label">{{#str}} date{{/str}}</label>
+    <input class="form-control" type="date" name="date" id="date" />
+
+    <label for="timefrom" class="form-label">{{#str}} timefrom, local_exammode{{/str}}</label>
+    <input class="form-control" type="time" name="timefrom" id="timefrom" />
+
+    <label for="timeto" class="form-label">{{#str}} timeto, local_exammode{{/str}}</label>
+    <input class="form-control" type="time" name="timeto" id="timeto" />
+
+    <input class="btn btn-primary" type="submit"
+</form>

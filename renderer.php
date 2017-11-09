@@ -46,5 +46,17 @@ class local_exammode_renderer extends plugin_renderer_base {
 
         return $table;
     }
+
+    public function render_newpage(\local_exammode\output\newpage $newpage) {
+        global $OUTPUT;
+        return $OUTPUT->moodleform(new \local_exammode\new_exam_form());
+        /*
+        return $this->render_from_template(
+                'local_exammode/new_page',
+                $newpage->export_for_template($this)
+        );
+         *
+         */
+    }
 }
 

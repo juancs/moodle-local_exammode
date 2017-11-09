@@ -48,7 +48,13 @@ $manager = local_exammode\manager::get_instance();
 $output = $PAGE->get_renderer('local_exammode');
 echo $output->header();
 
-if ($action === 'delete') {
+if ($action === 'new') {
+
+    $newpage = new \local_exammode\output\newpage();
+    echo $output->render($newpage);
+
+    die;
+} else if ($action === 'delete') {
     $examid = required_param('examid', PARAM_INT);
     $sesskey = optional_param('sesskey', null, PARAM_RAW);
     if (!$sesskey) {
@@ -68,7 +74,8 @@ if ($action === 'delete') {
     }
     
     require_sesskey();
-    $manager->delete_exam($examid);
+    // TODO: delete_exam has to unassign the system role defined.
+    $manager->delete_exam($examid);    
 }
 
 $exams = $manager->get_exams_for_course($courseid);
