@@ -57,7 +57,7 @@ if ($action === 'new' || $action === 'edit') {
 
     $newpage = new \local_exammode\output\newpage($examid, $courseid);
     if ($newpage->is_cancelled()) {
-
+        echo $output->header();
     } else if ($data = $newpage->get_data()) {
         // Data is already validated here, so timefrom and duration are within
         // the same day.
