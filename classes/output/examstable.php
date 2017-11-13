@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Descripción 
+ * Descripción
  *
  * @package    local_exammode
  * @copyright  2017 Universitat Jaume I (https://www.uji.es/)
@@ -41,7 +41,7 @@ class examstable extends \flexible_table implements \renderable {
         $this->calendar = \core_calendar\type_factory::get_calendar_instance();
         $this->courseid = $courseid;
         $this->exams = $exams;
-        
+
         $this->define_columns(
             array(
                 'choose',
@@ -91,18 +91,6 @@ class examstable extends \flexible_table implements \renderable {
         global $OUTPUT;
 
         $ret = $OUTPUT->action_icon(
-            new \moodle_url(
-                '/local/exammode/edit.php',
-                array(
-                    'courseid' => $this->courseid,
-                    'action' => 'disable',
-                    'examid' => $data->get_id()
-                )
-            ),
-            new \pix_icon('i/hide', get_string('enable'))
-        );
-
-        $ret .= $OUTPUT->action_icon(
             new \moodle_url(
                 '/local/exammode/edit.php',
                 array(

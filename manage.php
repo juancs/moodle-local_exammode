@@ -46,15 +46,53 @@ $PAGE->set_title("Manage Exam Modes");
 $manager = local_exammode\manager::get_instance();
 
 $output = $PAGE->get_renderer('local_exammode');
-echo $output->header();
 
 if ($action === 'new') {
 
-    $newpage = new \local_exammode\output\newpage();
-    echo $output->render($newpage);
+    $newpage = new \local_exammode\output\newpage($courseid);
+    if ($newpage->is_cancelled()) {
 
-    die;
+    } else if ($data = $newpage->get_data()) {
+        // Data is already validated here, so timefrom and duration are within
+        // the same day.
+        $exam = new local_exammode\objects\exammode(
+                null,
+                $courseid,
+                $data->timefrom,
+                $data->timefrom + $data->duration
+        );
+        if (!$manager->add_exammode($exam)) {
+            redirect(
+                new \moodle_url('/local/exammode/manage.php', array('courseid' => $courseid)),
+                get_string('newexamerror', 'local_exammode'),
+                5,
+                \core\output\notification::NOTIFY_ERROR
+            );
+        } else {
+
+            $a = new \stdClass();
+            $a->day = userdate($data->timefrom, get_string('strftimedate', 'langconfig'));
+            $a->from = userdate($data->timefrom, get_string('strftimetime', 'langconfig'));
+            $a->to = userdate($data->timefrom + $data->duration, get_string('strftimetime', 'langconfig'));
+
+            redirect(
+                    new \moodle_url('/local/exammode/manage.php', array('courseid' => $courseid)),
+                    get_string('newexamsuccess', 'local_exammode', $a),
+                    5,
+                    \core\output\notification::NOTIFY_SUCCESS
+            );
+
+        }
+
+    } else {
+        echo $output->header();
+        echo $output->render($newpage);
+        echo $output->footer();
+        die;
+    }
+
 } else if ($action === 'delete') {
+    echo $output->header();
     $examid = required_param('examid', PARAM_INT);
     $sesskey = optional_param('sesskey', null, PARAM_RAW);
     if (!$sesskey) {
@@ -72,10 +110,12 @@ if ($action === 'new') {
         echo $output->footer();
         die;
     }
-    
+
     require_sesskey();
     // TODO: delete_exam has to unassign the system role defined.
-    $manager->delete_exam($examid);    
+    $manager->delete_exam($examid);
+} else {
+    echo $output->header();
 }
 
 $exams = $manager->get_exams_for_course($courseid);

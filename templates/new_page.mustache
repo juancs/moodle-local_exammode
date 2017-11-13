@@ -4,19 +4,14 @@
     Page to schedule a new exam.
 
     Context variables:
-    
+    * form. The newpage form in HTML format :)
 }}
 <div class="scheduled_exammodes">
 
-    <form>
-        <label for="date" class="form-label">{{#str}} date{{/str}}</label>
-        <input class="form-control" type="date" name="date" id="date" />
-        
-        <label for="timefrom" class="form-label">{{#str}} timefrom, local_exammode{{/str}}</label>
-        <input class="form-control" type="time" name="timefrom" id="timefrom" />
+    <h1>{{#str}}newexam, local_exammode{{/str}}</h1>
+    
+    <p>{{#str}}newexamdesc, local_exammode{{/str}}</p>
 
-        <label for="timeto" class="form-label">{{#str}} timeto, local_exammode{{/str}}</label>
-        <input class="form-control" type="time" name="timeto" id="timeto" />
-    </form>
+    {{{form}}}
 
 </div>

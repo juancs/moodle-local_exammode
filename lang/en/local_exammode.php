@@ -39,3 +39,17 @@ $string['scheduledexammodesdesc'] = 'You can manage the scheduled exam modes for
         . 'of time defined.';
 
 $string['newexam'] = 'New exam';
+$string['duration'] = 'Duration';
+
+$string['newexamdesc'] = 'Please choose a start date/time and a duration for '
+        . 'the exam. The <em>mode will start 15 minutes before the start '
+        . 'date/time</em> to ensure all your students are in exam mode before the '
+        . 'exam takes plase. Exam modes can be scheduled just within a day.';
+
+$string['errordurationlong'] = 'An exam mode can be set just within the same '
+        . 'day';
+
+$string['newexamsuccess'] = 'New exam mode scheduled on {$a->day} from {$a->from} to '
+        . '{$a->to}';
+
+$string['newexamerror'] = 'Failed to schedule the new exammode';
