@@ -82,6 +82,11 @@ class newpage extends \moodleform implements \renderable, \templatable {
                 $errors['duration'] = get_string('errordurationlong', 'local_exammode');
             }
         }
+
+        if ($timefrom + $duration < time()) {
+            $errors['duration'] = get_string('errorexaminthepast', 'local_exammode');
+            $errors['timefrom'] = get_string('errorexaminthepast', 'local_exammode');
+        }
         return $errors;
     }
 

@@ -49,6 +49,8 @@ $string['newexamdesc'] = 'Please choose a start date/time and a duration for '
 $string['errordurationlong'] = 'An exam mode can be set just within the same '
         . 'day';
 
+$string['errorexaminthepast'] = 'An exam mode cannot be set in the past';
+
 $string['newexamsuccess'] = 'Exam mode scheduled on {$a->day} from {$a->from} to '
         . '{$a->to}';
 
