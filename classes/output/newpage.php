@@ -37,8 +37,10 @@ class newpage extends \moodleform implements \renderable, \templatable {
     const DEFAULT_DURATION = 2*3600;
 
     private $courseid;
+    private $examid;
 
-    public function __construct($courseid) {
+    public function __construct($examid, $courseid) {
+        $this->examid = $examid;
         $this->courseid = $courseid;
         parent::__construct();
     }
@@ -56,7 +58,10 @@ class newpage extends \moodleform implements \renderable, \templatable {
         $mform->addElement('hidden', 'courseid', $this->courseid);
         $mform->setType('courseid', PARAM_INT);
 
-        $mform->addElement('hidden', 'action', 'new');
+        $mform->addElement('hidden', 'examid', $this->examid);
+        $mform->setType('examid', PARAM_INT);
+
+        $mform->addElement('hidden', 'action', optional_param('action', 'new', PARAM_ALPHANUMEXT));
         $mform->setType('action', PARAM_ALPHANUMEXT);
 
         $this->add_action_buttons();
@@ -84,5 +89,14 @@ class newpage extends \moodleform implements \renderable, \templatable {
         return array(
             'form' => $this->render()
         );
+    }
+
+    public function set_exam(\local_exammode\objects\exammode $exam) {
+
+        $default_values = new \stdClass;
+        $default_values->timefrom = $exam->get_from();
+        $default_values->duration = $exam->get_to() - $exam->get_from();
+
+        parent::set_data($default_values);
     }
 }

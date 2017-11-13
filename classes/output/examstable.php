@@ -92,7 +92,7 @@ class examstable extends \flexible_table implements \renderable {
 
         $ret = $OUTPUT->action_icon(
             new \moodle_url(
-                '/local/exammode/edit.php',
+                '/local/exammode/manage.php',
                 array(
                     'courseid' => $this->courseid,
                     'action' => 'edit',

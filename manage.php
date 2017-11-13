@@ -47,21 +47,34 @@ $manager = local_exammode\manager::get_instance();
 
 $output = $PAGE->get_renderer('local_exammode');
 
-if ($action === 'new') {
+if ($action === 'new' || $action === 'edit') {
 
-    $newpage = new \local_exammode\output\newpage($courseid);
+    if ($action === 'edit') {
+        $examid = required_param('examid', PARAM_INT);
+    } else {
+        $examid = null;
+    }
+
+    $newpage = new \local_exammode\output\newpage($examid, $courseid);
     if ($newpage->is_cancelled()) {
 
     } else if ($data = $newpage->get_data()) {
         // Data is already validated here, so timefrom and duration are within
         // the same day.
         $exam = new local_exammode\objects\exammode(
-                null,
+                $examid,
                 $courseid,
                 $data->timefrom,
                 $data->timefrom + $data->duration
         );
-        if (!$manager->add_exammode($exam)) {
+
+        if ($action === 'new') {
+            $success = $manager->add_exam($exam);
+        } else {
+            $success = $manager->update_exam($exam);
+        }
+
+        if (!$success) {
             redirect(
                 new \moodle_url('/local/exammode/manage.php', array('courseid' => $courseid)),
                 get_string('newexamerror', 'local_exammode'),
@@ -86,6 +99,14 @@ if ($action === 'new') {
 
     } else {
         echo $output->header();
+
+        if ($action === 'edit') {
+            $examid = required_param('examid', PARAM_INT);
+
+            $exam = $manager->get_exam($examid);
+            $newpage->set_exam($exam);
+        }
+
         echo $output->render($newpage);
         echo $output->footer();
         die;

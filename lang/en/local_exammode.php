@@ -49,7 +49,7 @@ $string['newexamdesc'] = 'Please choose a start date/time and a duration for '
 $string['errordurationlong'] = 'An exam mode can be set just within the same '
         . 'day';
 
-$string['newexamsuccess'] = 'New exam mode scheduled on {$a->day} from {$a->from} to '
+$string['newexamsuccess'] = 'Exam mode scheduled on {$a->day} from {$a->from} to '
         . '{$a->to}';
 
-$string['newexamerror'] = 'Failed to schedule the new exammode';
+$string['newexamerror'] = 'Failed to schedule exammode';

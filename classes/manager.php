@@ -122,7 +122,7 @@ class manager {
      * @param \local_exammode\objects\exammode $em
      * @return boolean true on success, false on failure.
      */
-    public function add_exammode (objects\exammode $em) {
+    public function add_exam (objects\exammode $em) {
         global $DB;
         if ($em->get_id()) {
             $em->set_id(null);
@@ -166,4 +166,28 @@ class manager {
         $DB->delete_records('local_exammode', array('id' => $examid));
     }
 
+    /**
+     * Returns.
+     *
+     * @global \moodle_database $DB
+     * @param int $examid
+     * @return objects\exammode
+     */
+    public function get_exam($examid) {
+        global $DB;
+        $dbrec = $DB->get_record('local_exammode', array('id' => $examid), '*', MUST_EXIST);
+        return objects\exammode::to_exammode($dbrec);
+    }
+
+    /**
+     * Actualiza un examen programado.
+     *
+     * @global \moodle_database $DB
+     * @param \local_exammode\objects\exammode $exam
+     * @return type
+     */
+    public function update_exam(objects\exammode $exam) {
+        global $DB;
+        return $DB->update_record('local_exammode', $exam->to_db_record());
+    }
 }
