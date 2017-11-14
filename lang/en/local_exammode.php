@@ -55,3 +55,8 @@ $string['newexamsuccess'] = 'Exam mode scheduled on {$a->day} from {$a->from} to
         . '{$a->to}';
 
 $string['newexamerror'] = 'Failed to schedule exammode';
+
+$string['exammodesettings'] = 'Exam mode global configuration';
+$string['roletoadd'] = 'Role to add';
+$string['roletoadddesc'] = 'Role to add at system contetx to course students '
+        . 'when we are in exam mode.';
