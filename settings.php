@@ -29,14 +29,23 @@ if ($hassiteconfig) {
     $settings = new admin_settingpage('local_exammode', get_string('exammodesettings', 'local_exammode'));
     $ADMIN->add('localplugins', $settings);
 
-    // roletoadd. The role to add to the students when in exam mode.
     $roles = role_get_names(null, ROLENAME_ORIGINAL, true);
+
+    // roletoadd. The role to add to the students when in exam mode.
     $settings->add(new admin_setting_configselect(
-            'roletoadd',
-            get_string('roletoadd', 'local_exammode'),
-            get_string('roletoadddesc', 'local_exammode'),
+            'local_exammode/roletosystem',
+            get_string('roletosystem', 'local_exammode'),
+            get_string('roletosystemdesc', 'local_exammode'),
             null,
             $roles
     ));
 
+    // rolehideblock. The role to add to prohibited blocks.
+    $settings->add(new admin_setting_configselect(
+            'local_exammode/roletohideblock',
+            get_string('roletohideblock', 'local_exammode'),
+            get_string('roletohideblockdesc', 'local_exammode'),
+            null,
+            $roles
+    ));
 }

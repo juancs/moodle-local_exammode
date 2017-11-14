@@ -35,5 +35,15 @@ $capabilities = array(
             'teacher' => CAP_PREVENT,
             'student' => CAP_PREVENT
         )
+    ),
+    'local/exammode:enterexammode' => array(
+        'riskbitmask' => RISK_DATALOSS,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'editingteacher' => CAP_PREVENT,
+            'teacher' => CAP_PREVENT,
+            'student' => CAP_ALLOW
+        )
     )
 );

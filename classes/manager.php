@@ -33,6 +33,13 @@ class manager {
     const GRACE_TIME = 10 * 60;
 
     /**
+     * Tenemos la configuración.
+     *
+     * @var config
+     */
+    private $config;
+
+    /**
      * A singleton instance.
      *
      * @var manager
@@ -51,68 +58,10 @@ class manager {
     }
 
     /**
-     * Gets the exmmode courses for the user.
-     *
-     * @global \moodle_database $DB
-     * @param int $userid
-     * @return objects\exammode[] An array of courseids the user is enroled into.
+     * Instantiate the class with get_instance() --> singleton.
      */
-    public function get_exammode_courses ($userid) {
-        global $DB;
-
-        $courses = \enrol_get_users_courses($userid, true, 'id', '');
-        if (!$courses) {
-            return array();
-        }
-        $courseids = array_map(function($course) {
-            return $course->id;
-        }, $courses);
-
-        list($sql, $params) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED);
-
-        $params['from'] = time() - self::GRACE_TIME;
-        $params['to'] = time();
-
-        $courses = $DB->get_records_select(
-             'local_exammode',
-             'courseid $sql AND from <= :from AND to >= :to',
-             $params,
-             '',
-             '*'
-        );
-        return objects\exammode::to_exammode($courses);
-    }
-
-    /**
-     * Is the user in exammode
-     *
-     * @global \moodle_database $DB
-     * @param int $userid
-     * @param int $courseid
-     */
-    public function is_in_exammode ($userid, $courseid) {
-        global $DB;
-
-        $from = time() - self::GRACE_TIME;
-        $to = time();
-
-        $sql = "SELECT * "
-                . "FROM {local_exammode} e "
-                . "     JOIN {local_exammode_user} eu ON eu.exammodeid = e.id "
-                . "WHERE eu.userid = :userid "
-                . "      AND e.courseid = :courseid "
-                . "      AND e.from <= :from "
-                . "      AND e.to >= :to";
-
-        return $DB->record_exists_sql(
-            $sql,
-            array(
-                'userid' => $userid,
-                'courseid' => $courseid,
-                'from' => $from,
-                'to' => $to
-            )
-        );
+    private function __construct() {
+        $this->config = config::get_instance();
     }
 
     /**
@@ -156,6 +105,7 @@ class manager {
     }
 
     /**
+     * Deletes an exam.
      *
      * @global \moodle_database $DB
      * @param int $id
@@ -167,7 +117,7 @@ class manager {
     }
 
     /**
-     * Returns.
+     * Returns an exam with id examid.
      *
      * @global \moodle_database $DB
      * @param int $examid
@@ -189,5 +139,180 @@ class manager {
     public function update_exam(objects\exammode $exam) {
         global $DB;
         return $DB->update_record('local_exammode', $exam->to_db_record());
+    }
+
+    /**
+     * Gets the courses that should be in exammode now.
+     *
+     * @global \moodle_database $DB
+     * @return objects\exammode[]
+     */
+    public function get_courses_in_exammode () {
+
+        global $DB;
+
+        $sql = "SELECT id, courseid, timefrom, timeto "
+                . "FROM {local_exammode} em "
+                . "WHERE em.timefrom <= :from "
+                . "      AND em.timeto >= :to";
+
+        $dbrecs = $DB->get_records_sql($sql, array('from' => time(), 'to' => time()));
+
+        return array_map(function($dbrec) {
+            return objects\exammode::to_exammode($dbrec);
+        }, $dbrecs);
+    }
+
+    /**
+     * Gets an array of userid that should be in exammode now.
+     *
+     * @global \moodle_database $DB
+     * @return objects\exammode_user[]
+     */
+    public function get_all_users_in_exammode() {
+        global $DB;
+
+        $users = array();
+        $exammode = $this->get_courses_in_exammode();
+        foreach ($exammode as $em) {
+            $context = \context_course::instance($em->get_courseid());
+            $aux = \get_users_by_capability(
+                    $context,
+                    'local/exammode:enterexammode',
+                    'u.id'
+            );
+            $aux = array_map(function($u) use ($em) {
+                return new objects\exammode_user(null, $em->get_id(), $u->id);
+            }, $aux);
+            $users = array_merge($users, $aux);
+        }
+
+        return $users;
+    }
+
+    /**
+     * Gets an array of exammode_user of users that are currently in exammode.
+     *
+     * @global \moodle_database $DB
+     * @return objects\exammode_user[]
+     */
+    public function get_users_in_exammode() {
+        global $DB;
+
+        $sql = "SELECT * "
+                . "FROM {local_exammode_user} emu";
+
+        $dbrecs = $DB->get_records_sql($sql);
+        return objects\exammode_user::get_from_db($dbrecs);
+    }
+
+    /**
+     * Puts a user in exammode.
+     *
+     * @global \moodle_database $DB
+     * @param objects\exammode_user
+     */
+    public function put_user_in_exammode(objects\exammode_user $emu) {
+        global $DB;
+        $this->configure_moodle_exammode($emu);
+        $id = $DB->insert_record('local_exammode_user', $emu->to_db());
+        $emu->set_id($id);
+    }
+
+    /**
+     * Removes a user from exammode.
+     *
+     * @param objects\exammode_user $emu
+     */
+    public function remove_user_from_exammode(objects\exammode_user $emu) {
+        global $DB;
+
+        $count = $DB->count_records('local_exammode_user', array('userid' => $emu->get_userid()));
+        if ($count == 1) {
+            $this->unconfigure_moodle_exammode($emu);
+        }
+        $DB->delete_records('local_exammode_user', array('id' => $emu->get_id()));
+    }
+
+    /**
+     * Returns an array of blockinstance ids for blocks prohibited at dashboard.
+     *
+     * @global \moodle_database $DB
+     * @param \local_exammode\objects\exammode_user $emu
+     * @return int[]
+     */
+    private function get_prohibited_dashboard_blocks(objects\exammode_user $emu) {
+        global $DB;
+
+        $sql = "SELECT id "
+                . "FROM {block_instances} bi "
+                . "WHERE parentcontextid = :contextid "
+                . "AND blockname = :privatefiles";
+
+        $blockinstances = $DB->get_records_sql(
+                $sql,
+                array(
+                    'contextid' => \context_user::instance($emu->get_userid())->id,
+                    'privatefiles' => 'private_files'
+                )
+        );
+
+        return array_map(function($bi) {
+            return $bi->id;
+        }, $blockinstances);
+    }
+
+    /**
+     * Performs the actions to put moodle into exammode for the user specified.
+     * @param \local_exammode\objects\exammode_user $emu
+     */
+    private function configure_moodle_exammode (objects\exammode_user $emu) {
+
+        // Assign the block role.
+        $blockinstances = $this->get_prohibited_dashboard_blocks($emu);
+        foreach ($blockinstances as $biid) {
+            $context = \context_block::instance($biid);
+            \role_assign(
+                    $this->config->get_roletohideblock(),
+                    $emu->get_userid(),
+                    $context->id,
+                    'local_exammode'
+            );
+        }
+
+        // Assign the system role.
+        \role_assign(
+                $this->config->get_roletosystem(),
+                $emu->get_userid(),
+                \context_system::instance()->id,
+                'local_exammode'
+        );
+    }
+
+    /**
+     * Removes the actions performed bu configure_moodle_exammode in order to
+     * return a user to a non-exammode state.
+     *
+     * @param objects\exammode_user $user
+     */
+    private function unconfigure_moodle_exammode (objects\exammode_user $emu) {
+
+        // Assign the role to show
+        $blockinstances = $this->get_prohibited_dashboard_blocks($emu);
+        foreach ($blockinstances as $biid) {
+            $context = \context_block::instance($biid);
+            \role_unassign(
+                    $this->config->get_roletohideblock(),
+                    $emu->get_userid(),
+                    $context->id,
+                    'local_exammode'
+            );
+        }
+        \role_unassign(
+                $this->config->get_roletosystem(),
+                $emu->get_userid(),
+                \context_system::instance()->id,
+                'local_exammode'
+        );
     }
 }

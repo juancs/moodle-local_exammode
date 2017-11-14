@@ -26,6 +26,7 @@
 $string['confirmdelete'] = 'Are you sure you want to delete this exam?';
 $string['exammode'] = 'Exam Mode';
 $string['exammode:manage'] = 'Allows to put a course into exam mode';
+$string['exammode:enterexammode'] = 'Allows a user to be put in exam mode';
 $string['manageexammode'] = 'Manage Exam Mode';
 $string['pluginname'] = 'Exam Mode';
 
@@ -57,6 +58,13 @@ $string['newexamsuccess'] = 'Exam mode scheduled on {$a->day} from {$a->from} to
 $string['newexamerror'] = 'Failed to schedule exammode';
 
 $string['exammodesettings'] = 'Exam mode global configuration';
-$string['roletoadd'] = 'Role to add';
-$string['roletoadddesc'] = 'Role to add at system contetx to course students '
+
+$string['roletosystem'] = 'Role to add at system level';
+$string['roletosystemdesc'] = 'Role to add at system context to course students '
         . 'when we are in exam mode.';
+
+$string['roletohideblock'] = 'Role to add to hide blocks';
+$string['roletohideblockdesc'] = 'A role to assign at block level in the '
+        . 'dashboard in order to hide prohibited blocks (ie. private files block)';
+
+$string['update_exammode_users'] = 'Update exammode users';

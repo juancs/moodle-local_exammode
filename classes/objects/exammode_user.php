@@ -53,4 +53,35 @@ class exammode_user {
         $this->userid = $userid;
     }
 
+    public function to_db() {
+        $ret = new \stdClass();
+        $ret->id = $this->id;
+        $ret->exammodeid = $this->exammodeid;
+        $ret->userid = $this->userid;
+        return $ret;
+    }
+
+    public function get_id() {
+        return $this->id;
+    }
+
+    public function get_exammodeid() {
+        return $this->exammodeid;
+    }
+
+    public function get_userid() {
+        return $this->userid;
+    }
+
+    public function set_id($id) {
+        $this->id = $id;
+    }
+
+    public function set_exammodeid($exammodeid) {
+        $this->exammodeid = $exammodeid;
+    }
+
+    public function set_userid($userid) {
+        $this->userid = $userid;
+    }
 }
