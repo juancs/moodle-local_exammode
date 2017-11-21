@@ -162,6 +162,36 @@ class manager {
             return objects\exammode::to_exammode($dbrec);
         }, $dbrecs);
     }
+    
+    /**
+     * Comprobar si el curso están en exammode.
+     *
+     * @param string $courseid
+     * @global \moodle_database $DB
+     * @return boolean
+     */
+    public function is_course_in_exammode ($courseId) {
+
+        global $DB;
+
+        $sql = "SELECT id, courseid, timefrom, timeto "
+                . "FROM {local_exammode} em "
+                . "WHERE courseid = :courseid "
+                . "      AND em.timefrom <= :from "
+                . "      AND em.timeto >= :to";
+
+        $dbrec = $DB->get_record_sql($sql, array('courseid' => $courseId, 'from' => time(), 'to' => time()));
+
+        if (!$dbrec) {
+            return null;
+        }
+        else {
+            return objects\exammode::to_exammode($dbrec);
+        }
+
+        
+        
+    }
 
     /**
      * Gets an array of userid that should be in exammode now.
