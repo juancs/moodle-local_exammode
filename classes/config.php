@@ -26,6 +26,11 @@
 namespace local_exammode;
 
 class config {
+
+    /**
+     * The singleton instance.
+     * @var config
+     */
     private static $instance;
 
     private $config;

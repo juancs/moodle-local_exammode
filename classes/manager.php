@@ -30,6 +30,9 @@ defined('MOODLE_INTERNAL') || die();
 
 class manager {
 
+    /**
+     * Grace time in seconds.
+     */
     const GRACE_TIME = 10 * 60;
 
     /**
@@ -156,13 +159,19 @@ class manager {
                 . "WHERE em.timefrom <= :from "
                 . "      AND em.timeto >= :to";
 
-        $dbrecs = $DB->get_records_sql($sql, array('from' => time(), 'to' => time()));
+        $dbrecs = $DB->get_records_sql(
+                $sql,
+                array(
+                    'from' => time() - self::GRACE_TIME,
+                    'to' => time() + self::GRACE_TIME
+                )
+        );
 
         return array_map(function($dbrec) {
             return objects\exammode::to_exammode($dbrec);
         }, $dbrecs);
     }
-    
+
     /**
      * Comprobar si el curso están en exammode.
      *
@@ -174,23 +183,28 @@ class manager {
 
         global $DB;
 
+        $time = time() - self::GRACE_TIME;
+
         $sql = "SELECT id, courseid, timefrom, timeto "
                 . "FROM {local_exammode} em "
                 . "WHERE courseid = :courseid "
                 . "      AND em.timefrom <= :from "
                 . "      AND em.timeto >= :to";
 
-        $dbrec = $DB->get_record_sql($sql, array('courseid' => $courseId, 'from' => time(), 'to' => time()));
+        $dbrec = $DB->get_record_sql(
+                $sql,
+                array(
+                    'courseid' => $courseId,
+                    'from' => time() - self::GRACE_TIME,
+                    'to' => time() + self::GRACE_TIME
+                )
+        );
 
         if (!$dbrec) {
             return null;
-        }
-        else {
+        } else {
             return objects\exammode::to_exammode($dbrec);
         }
-
-        
-        
     }
 
     /**
@@ -229,10 +243,7 @@ class manager {
     public function get_users_in_exammode() {
         global $DB;
 
-        $sql = "SELECT * "
-                . "FROM {local_exammode_user} emu";
-
-        $dbrecs = $DB->get_records_sql($sql);
+        $dbrecs = $DB->get_records('local_exammode_user');
         return objects\exammode_user::get_from_db($dbrecs);
     }
 
@@ -244,9 +255,14 @@ class manager {
      */
     public function put_user_in_exammode(objects\exammode_user $emu) {
         global $DB;
+
+        $trx = $DB->start_delegated_transaction();
+
         $this->configure_moodle_exammode($emu);
         $id = $DB->insert_record('local_exammode_user', $emu->to_db());
         $emu->set_id($id);
+
+        $trx->allow_commit();
     }
 
     /**
@@ -294,11 +310,12 @@ class manager {
 
     /**
      * Performs the actions to put moodle into exammode for the user specified.
+     *
      * @param \local_exammode\objects\exammode_user $emu
      */
     private function configure_moodle_exammode (objects\exammode_user $emu) {
 
-        // Assign the block role.
+        // Assign the blocks role.
         $blockinstances = $this->get_prohibited_dashboard_blocks($emu);
         foreach ($blockinstances as $biid) {
             $context = \context_block::instance($biid);

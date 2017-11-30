@@ -44,7 +44,6 @@ class examstable extends \flexible_table implements \renderable {
 
         $this->define_columns(
             array(
-                'choose',
                 'date',
                 'timefrom',
                 'timeto',
@@ -53,7 +52,6 @@ class examstable extends \flexible_table implements \renderable {
         );
         $this->define_headers(
             array(
-                '',
                 get_string('date'),
                 get_string('timefrom', 'local_exammode'),
                 get_string('timeto', 'local_exammode'),
@@ -70,9 +68,6 @@ class examstable extends \flexible_table implements \renderable {
         return $this->exams;
     }
 
-    protected function col_choose($data) {
-        return \html_writer::checkbox("algo", "valor", false);
-    }
     protected function col_date(\local_exammode\objects\exammode $data) {
         return userdate($data->get_from(), get_string('strftimedate', 'langconfig'));
     }

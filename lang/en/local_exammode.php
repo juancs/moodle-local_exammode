@@ -68,3 +68,5 @@ $string['roletohideblockdesc'] = 'A role to assign at block level in the '
         . 'dashboard in order to hide prohibited blocks (ie. private files block)';
 
 $string['update_exammode_users'] = 'Update exammode users';
+
+$string['deleteexamsuccess'] = 'Exammode successfully deleted.';
