@@ -362,4 +362,16 @@ class manager {
                 'local_exammode'
         );
     }
+
+    /**
+     * Determines if a user is in exammode now in any course.
+     *
+     * @global \moodle_database $DB
+     * @param int $userid
+     */
+    public function is_user_in_exammode ($userid) {
+       global $DB;
+       return true;
+       return $DB->record_exists('local_exammode_user', array('userid' => $userid));
+    }
 }

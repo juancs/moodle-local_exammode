@@ -70,3 +70,6 @@ $string['roletohideblockdesc'] = 'A role to assign at block level in the '
 $string['update_exammode_users'] = 'Update exammode users';
 
 $string['deleteexamsuccess'] = 'Exammode successfully deleted.';
+$string['nauthz_exammode'] = 'You\'re not authorized to access {$a} '
+        . 'because you\'re in exammode now. This means that you cannot access '
+        . 'all funcionality in this site until this mode ends.';
