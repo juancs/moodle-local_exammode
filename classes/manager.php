@@ -178,13 +178,13 @@ class manager {
      *
      * @param string $courseid
      * @global \moodle_database $DB
-     * @return boolean
+     * @return objects\exammode|null
      */
     public function is_course_in_exammode ($courseId) {
 
         global $DB;
 
-        $time = time() - self::GRACE_TIME;
+        $time = time();
 
         $sql = "SELECT id, courseid, timefrom, timeto "
                 . "FROM {local_exammode} em "
@@ -196,16 +196,16 @@ class manager {
                 $sql,
                 array(
                     'courseid' => $courseId,
-                    'from' => time() - self::GRACE_TIME,
-                    'to' => time() + self::GRACE_TIME
+                    'from' => $time + self::GRACE_TIME,
+                    'to' => $time - self::GRACE_TIME
                 )
         );
 
         if (!$dbrec) {
             return null;
-        } else {
-            return objects\exammode::to_exammode($dbrec);
         }
+
+        return objects\exammode::to_exammode($dbrec);
     }
 
     /**
