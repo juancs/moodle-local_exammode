@@ -59,3 +59,9 @@ $string['scheduledexammodesdesc'] = 'You can manage the scheduled exam modes for
 $string['timefrom'] = 'Start';
 $string['timeto'] = 'End';
 $string['update_exammode_users'] = 'Update exammode users';
+
+$string['deleteexamsuccess'] = 'Exammode successfully deleted.';
+$string['nauthz_exammode'] = 'You\'re not authorized to access {$a} '
+        . 'because you\'re in exammode now. This means that you cannot access '
+	. 'all funcionality in this site until this mode ends.';
+

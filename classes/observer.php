@@ -15,36 +15,28 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Output exammode.
+ * Event observer for exammode.
  *
- * @package    local
- * @subpackage exammode
+ * @package    local_exammode
  * @copyright  2017 Universitat Jaume I (https://www.uji.es/)
- * @author     Juan Segarra Montesinos <juan.segarra@uji.es>
+ * @author     Emili Gonzalez <egonzale@uji.es>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_exammode\output;
-
 defined('MOODLE_INTERNAL') || die();
 
-class exammode implements \templatable, \renderable {
-    
-    /**
-     * The exammode to show.
-     *
-     * @var \local_exammode\objects\exammode 
-     */
-    private $exammode;
+class local_exammode_observer {
+    public static function local_exammode_user_enrolment_created(\core\event\user_enrolment_created $event) {
+        $manager = local_exammode\manager::get_instance();
 
-    public function __construct(\local_exammode\objects\exammode $exammode) {
-        $this->exammode = $exammode;
-    }
-    public function export_for_template(\renderer_base $output) {
-        return array(
-            'timefrom' => usergetdate($this->exammode->get_from()),
-            'timeto' => usergetdate($this->exammode->get_to()),
-            'actions' => '1 2 3'
-        );
+        $em = $manager->is_course_in_exammode($event->courseid);
+        if ( $em != null ) {
+            $emu = new \local_exammode\objects\exammode_user(
+                    null,
+                    $em->get_id(),
+                    $event->relateduserid
+            );
+            $manager->put_user_in_exammode($emu);
+        }
     }
 }

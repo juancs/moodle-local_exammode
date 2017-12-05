@@ -27,7 +27,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
-    // Allows a user to manage exam modes for a course.
+    // Allows a user to configure exammode for a course.
     'local/exammode:manage' => array(
         'riskbitmask' => RISK_DATALOSS,
         'captype' => 'write',

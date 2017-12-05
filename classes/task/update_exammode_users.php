@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -26,6 +25,7 @@
 namespace local_exammode\task;
 
 class update_exammode_users extends \core\task\scheduled_task {
+
     public function get_name() {
         return get_string('update_exammode_users', 'local_exammode');
     }
@@ -33,10 +33,13 @@ class update_exammode_users extends \core\task\scheduled_task {
     public function execute() {
         $manager = \local_exammode\manager::get_instance();
 
+        // Users that should be in exammode.
         $allusers = $manager->get_all_users_in_exammode();
+
+        // Users that are right now in exammode.
         $currentusers = $manager->get_users_in_exammode();
 
-        // To remove.
+        // Remove from exammode.
         $toremove = array();
         foreach ($currentusers as $cu) {
             $found = false;
@@ -53,7 +56,7 @@ class update_exammode_users extends \core\task\scheduled_task {
             }
         }
 
-        // Toadd.
+        // Put in exammode.
         $toadd = array();
         foreach ($allusers as $au) {
             $found = false;

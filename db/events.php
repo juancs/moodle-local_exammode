@@ -15,36 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Output exammode.
+ * Exammode event observer.
  *
- * @package    local
- * @subpackage exammode
+ * @package    local_exammode
  * @copyright  2017 Universitat Jaume I (https://www.uji.es/)
- * @author     Juan Segarra Montesinos <juan.segarra@uji.es>
+ * @author     Emili Gonzalez <egonzale@uji.es>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_exammode\output;
-
 defined('MOODLE_INTERNAL') || die();
 
-class exammode implements \templatable, \renderable {
-    
-    /**
-     * The exammode to show.
-     *
-     * @var \local_exammode\objects\exammode 
-     */
-    private $exammode;
-
-    public function __construct(\local_exammode\objects\exammode $exammode) {
-        $this->exammode = $exammode;
-    }
-    public function export_for_template(\renderer_base $output) {
-        return array(
-            'timefrom' => usergetdate($this->exammode->get_from()),
-            'timeto' => usergetdate($this->exammode->get_to()),
-            'actions' => '1 2 3'
-        );
-    }
-}
+$observers = array(
+    array(
+        'eventname'   => '\core\event\user_enrolment_created',
+        'callback'    => 'local_exammode_observer::local_exammode_user_enrolment_created',
+    )
+);

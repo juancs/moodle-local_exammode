@@ -114,10 +114,12 @@ if ($action === 'new' || $action === 'edit') {
     }
 
 } else if ($action === 'delete') {
-    echo $output->header();
+
     $examid = required_param('examid', PARAM_INT);
     $sesskey = optional_param('sesskey', null, PARAM_RAW);
     if (!$sesskey) {
+        echo $output->header();
+
         echo $output->confirm(
             get_string('confirmdelete', 'local_exammode'),
             new \moodle_url(
@@ -136,6 +138,14 @@ if ($action === 'new' || $action === 'edit') {
     require_sesskey();
     // TODO: delete_exam has to unassign the system role defined.
     $manager->delete_exam($examid);
+
+    redirect(
+            new \moodle_url('/local/exammode/manage.php', array('courseid' => $courseid)),
+            get_string('deleteexamsuccess', 'local_exammode'),
+            5,
+            \core\output\notification::NOTIFY_SUCCESS
+    );
+
 } else {
     echo $output->header();
 }
