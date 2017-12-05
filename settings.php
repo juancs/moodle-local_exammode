@@ -18,7 +18,8 @@
 /**
  * Global settings.
  *
- * @package    local_exammode
+ * @package    local
+ * @subpackage exammode
  * @copyright  2017 Universitat Jaume I (http://www.uji.es/)
  * @author     Juan Segarra Montesinos <juan.segarra@uji.es>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later2

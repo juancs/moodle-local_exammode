@@ -17,7 +17,8 @@
 /**
  * Manager test.
  *
- * @package    local_exammode
+ * @package    local
+ * @subpackage exammode
  * @copyright  2017 Universitat Jaume I (https://www.uji.es/)
  * @author     Juan Segarra Montesinos <juan.segarra@uji.es>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
