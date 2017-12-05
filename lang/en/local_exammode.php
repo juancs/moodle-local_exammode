@@ -23,48 +23,38 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
+$string['actions'] = 'Actions';
 $string['confirmdelete'] = 'Are you sure you want to delete this exam?';
+$string['duration'] = 'Duration';
+$string['errordurationlong'] = 'An exam mode can be set just within the same '
+        . 'day';
+$string['errorexaminthepast'] = 'An exam mode cannot be set in the past';
 $string['exammode'] = 'Exam Mode';
 $string['exammode:manage'] = 'Allows to put a course into exam mode';
 $string['exammode:enterexammode'] = 'Allows a user to be put in exam mode';
+$string['exammodesettings'] = 'Exam mode global configuration';
+$string['newexam'] = 'New exam';
+$string['newexamdesc'] = 'Please choose a start date/time and a duration for '
+        . 'the exam. The <em>mode will start 15 minutes before the start '
+        . 'date/time</em> to ensure all your students are in exam mode before the '
+        . 'exam takes place. Exam modes can be scheduled just within a day.';
+$string['newexamerror'] = 'Failed to schedule exammode';
 $string['manageexammode'] = 'Manage Exam Mode';
+$string['newexamsuccess'] = 'Exam mode scheduled on {$a->day} from {$a->from} to '
+        . '{$a->to}';
 $string['pluginname'] = 'Exam Mode';
-
-$string['timefrom'] = 'Start';
-$string['timeto'] = 'End';
-$string['actions'] = 'Actions';
-
+$string['roletosystem'] = 'Role to add at system level';
+$string['roletosystemdesc'] = 'Role to add at system context to course students '
+        . 'when we are in exam mode.';
+$string['roletohideblock'] = 'Role to add to hide blocks';
+$string['roletohideblockdesc'] = 'A role to assign at block level in the '
+        . 'dashboard in order to hide prohibited blocks (ie. private files block)';
 $string['scheduledexammodes'] = 'Scheduled exam modes';
 $string['scheduledexammodesdesc'] = 'You can manage the scheduled exam modes for this course. '
         . 'Remember that an exam mode restricts what students can do during the period '
         . 'of time defined.';
-
-$string['newexam'] = 'New exam';
-$string['duration'] = 'Duration';
-
-$string['newexamdesc'] = 'Please choose a start date/time and a duration for '
-        . 'the exam. The <em>mode will start 15 minutes before the start '
-        . 'date/time</em> to ensure all your students are in exam mode before the '
-        . 'exam takes plase. Exam modes can be scheduled just within a day.';
-
-$string['errordurationlong'] = 'An exam mode can be set just within the same '
-        . 'day';
-
-$string['errorexaminthepast'] = 'An exam mode cannot be set in the past';
-
-$string['newexamsuccess'] = 'Exam mode scheduled on {$a->day} from {$a->from} to '
-        . '{$a->to}';
-
-$string['newexamerror'] = 'Failed to schedule exammode';
-
-$string['exammodesettings'] = 'Exam mode global configuration';
-
-$string['roletosystem'] = 'Role to add at system level';
-$string['roletosystemdesc'] = 'Role to add at system context to course students '
-        . 'when we are in exam mode.';
-
-$string['roletohideblock'] = 'Role to add to hide blocks';
-$string['roletohideblockdesc'] = 'A role to assign at block level in the '
-        . 'dashboard in order to hide prohibited blocks (ie. private files block)';
-
+$string['timefrom'] = 'Start';
+$string['timeto'] = 'End';
 $string['update_exammode_users'] = 'Update exammode users';
