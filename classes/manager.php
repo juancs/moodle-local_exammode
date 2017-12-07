@@ -209,7 +209,8 @@ class manager {
     }
 
     /**
-     * Gets an array of userid that should be in exammode now.
+     * Gets an array of userid that should be in exammode now (ie. potential
+     * users in exammode).
      *
      * @global \moodle_database $DB
      * @return objects\exammode_user[]
@@ -217,6 +218,7 @@ class manager {
     public function get_all_users_in_exammode() {
         global $DB;
 
+        // TODO: esta función debería llamarse get_potential_users_in_exammode()
         $users = array();
         $exammode = $this->get_courses_in_exammode();
         foreach ($exammode as $em) {

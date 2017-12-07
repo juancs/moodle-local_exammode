@@ -39,7 +39,18 @@ class manager_test extends advanced_testcase {
     private $user1_course1;
     private $user2_course1;
 
+    private $systemroleid;
+    private $blocksroleid;
+
     public function setUp() {
+
+        // Role configuration must go first.
+        $this->systemroleid = $this->getDataGenerator()->create_role();
+        $this->blocksroleid = $this->getDataGenerator()->create_role();
+
+        set_config('roletosystem', $this->systemroleid, 'local_exammode');
+        set_config('roletohideblock', $this->blocksroleid, 'local_exammode');
+
         $this->course1 = $this->getDataGenerator()->create_course();
         $this->course2 = $this->getDataGenerator()->create_course();
 
@@ -277,6 +288,32 @@ class manager_test extends advanced_testcase {
             $this->assertContains($user->get_userid(), $userids);
             $this->assertEquals($exam->get_id(), $user->get_exammodeid());
         }
+    }
+
+    public function test_put_user_in_exammode() {
+
+        $this->resetAfterTest();
+
+        // Cannot add block_private_file block because it doesn't have
+        // generators yet.
+
+        // Now test, test, test.
+        $manager = manager::get_instance();
+
+        $exam = new exammode(null, $this->course1->id, time() - 30, time() + 3600);
+        $manager->add_exam($exam);
+
+        $emu = new exammode_user(null, $exam->get_id(), $this->user1_course1->id);
+        $manager->put_user_in_exammode($emu);
+
+        // Test that has the system role assigned.
+        $roles = get_user_roles(context_system::instance(), $this->user1_course1->id);
+        $roleids = array_map(function($role) {
+            return $role->roleid;
+        }, $roles);
+
+        $this->assertContains($this->systemroleid, $roleids);
+
     }
 
 }
