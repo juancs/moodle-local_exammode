@@ -278,5 +278,4 @@ class manager_test extends advanced_testcase {
             $this->assertEquals($exam->get_id(), $user->get_exammodeid());
         }
     }
-
 }
