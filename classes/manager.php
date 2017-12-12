@@ -203,7 +203,9 @@ class manager {
     }
 
     /**
-     * Gets the courses that should be in exammode now.
+     * Gets the exammodes of courses that should be finished. DO NOT FILTER
+     * STATE_TODELETE exammodes because it's necessary to remove users from the
+     * update_exammode_users task.
      *
      * @global \moodle_database $DB
      * @return objects\exammode[]
