@@ -75,7 +75,7 @@ $string['roletohideblockdesc'] = 'Rol a asignar a nivel de bloque en el '
 
 $string['update_exammode_users'] = 'Actualiza usuarios en modo examen';
 
-$string['state'] = 'estado';
+$string['state'] = 'Estado';
 $string['state_configuring'] = 'Configurando';
 $string['state_configuringdesc'] = 'El modo de examen se está configurando actualmente.';
 $string['state_finished'] = 'Terminado';
