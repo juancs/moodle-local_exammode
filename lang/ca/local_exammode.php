@@ -51,3 +51,17 @@ $string['scheduledexammodesdesc'] = 'Pots gestionar els examens planificats per 
 $string['timefrom'] = 'Inici';
 $string['timeto'] = 'Fi';
 $string['update_exammode_users'] = 'Actualitza usuaris en mode examen';
+
+$string['error_invalid_state'] = 'Estat per al mode examen invàlid: {$a}';
+$string['state'] = 'Estat';
+$string['state_configuring'] = 'Configurant';
+$string['state_configuringdesc'] = 'El mode d\'examen s\'està configurant actualment.';
+$string['state_finished'] = 'Acabat';
+$string['state_finisheddesc'] = 'El mode d\'examen ha acabat.';
+$string['state_pending'] = 'Pendent';
+$string['state_pendingdesc'] = 'El mode d\'examen està pendent de ésser aplicat.';
+$string['state_unconfiguring'] = 'Desconfigurant.';
+$string['state_unconfiguringdesc'] = 'El mode d\'examen s\'esta configurant ara mateix.';
+$string['state_working'] = 'Funcionant';
+$string['state_workingdesc'] = 'El mode d\'examen ha sigut configurat completament i està funcionant actualment.';
+$string['update_exammode_state_task'] = 'Actualitza l\'estat del modes de examen.';

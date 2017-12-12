@@ -74,3 +74,16 @@ $string['roletohideblockdesc'] = 'Rol a asignar a nivel de bloque en el '
         . '(por ejemplo, el bloque Archivos privados)';
 
 $string['update_exammode_users'] = 'Actualiza usuarios en modo examen';
+
+$string['state'] = 'estado';
+$string['state_configuring'] = 'Configurando';
+$string['state_configuringdesc'] = 'El modo de examen se está configurando actualmente.';
+$string['state_finished'] = 'Terminado';
+$string['state_finisheddesc'] = 'El modo de examen ha terminado.';
+$string['state_pending'] = 'Pendiente';
+$string['state_pendingdesc'] = 'El modo de examen está pendiente de ser aplicado.';
+$string['state_unconfiguring'] = 'Desconfigurando';
+$string['state_unconfiguringdesc'] = 'El modo de examen se está configurando actualmente.';
+$string['state_working'] = 'Funcionando';
+$string['state_workingdesc'] = 'El modo de examen ha sido configurado completamente y está funcionando ahora mismo.';
+$string['update_exammode_state_task'] = 'Actualiza el estado de los modos de examen';
