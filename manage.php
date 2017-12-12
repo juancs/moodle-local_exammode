@@ -89,6 +89,13 @@ if ($action === 'new' || $action === 'edit') {
             );
         } else {
 
+            if ($action == 'edit') {
+                $event = local_exammode\event\exam_updated::create_from_exammode($exam);
+            } else if ($action == 'new') {
+                $event = local_exammode\event\exam_created::create_from_exammode($exam);
+            }
+            $event->trigger();
+
             $a = new \stdClass();
             $a->day = userdate($data->timefrom, get_string('strftimedate', 'langconfig'));
             $a->from = userdate($data->timefrom, get_string('strftimetime', 'langconfig'));

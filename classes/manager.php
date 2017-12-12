@@ -100,7 +100,8 @@ class manager {
         $sql = "SELECT em.* "
                 . "FROM {local_exammode} em "
                 . "WHERE courseid = :courseid "
-                . "      AND state != :deleted ";
+                . "      AND state != :deleted "
+                . "ORDER BY $sort";
 
         $recs = $DB->get_records_sql(
             $sql,

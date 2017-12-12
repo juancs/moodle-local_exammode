@@ -45,8 +45,8 @@ class update_exammode_users extends \core\task\scheduled_task {
                 $potentialusers = $manager->get_potential_users_for_exammode($exammode);
                 $currentusers = $manager->get_users_in_exammode($exammode->get_courseid());
 
-                $this->remove_users($potentialusers, $currentusers);
-                $this->add_users($potentialusers, $currentusers);
+                $this->remove_users($exammode, $potentialusers, $currentusers);
+                $this->add_users($exammode, $potentialusers, $currentusers);
 
                 $exammode->set_state(\local_exammode\objects\exammode::STATE_WORKING);
                 $manager->update_exam($exammode);
@@ -98,7 +98,7 @@ class update_exammode_users extends \core\task\scheduled_task {
      * @param \local_exammode\objects\exammode_user[] $potential
      * @param \local_exammode\objects\exammode_user[] $current
      */
-    private function remove_users($potential, $current) {
+    private function remove_users($exammode, $potential, $current) {
 
         $manager = \local_exammode\manager::get_instance();
 
@@ -116,6 +116,9 @@ class update_exammode_users extends \core\task\scheduled_task {
             }
             if (!$found) {
                 $manager->remove_user_from_exammode($cu);
+
+                $event = \local_exammode\event\user_abandoned::create_from_exammode($exammode, $cu);
+                $event->trigger();
             }
         }
     }
@@ -126,7 +129,7 @@ class update_exammode_users extends \core\task\scheduled_task {
      * @param \local_exammode\objects\exammode_user[] $potential
      * @param \local_exammode\objects\exammode_user[] $current
      */
-    private function add_users($potential, $current) {
+    private function add_users($exammode, $potential, $current) {
 
         global $CFG;
 
@@ -150,8 +153,10 @@ class update_exammode_users extends \core\task\scheduled_task {
                 require_once($CFG->dirroot . '/my/lib.php');
                 if ( \my_copy_page($au->get_userid()) !== false) {
                     $manager->put_user_in_exammode($au);
-                }
 
+                    $event = \local_exammode\event\user_started::create_from_exammode($exammode, $au);
+                    $event->trigger();
+                }
             }
         }
 
