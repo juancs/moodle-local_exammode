@@ -89,7 +89,7 @@ class manager {
     }
 
     /**
-     * Gets the exams scheduled for course.
+     * Gets the exams scheduled for course. Excludes STATE_TODELETE courses.
      *
      * @global \moodle_database $DB
      * @param int $courseid
@@ -97,12 +97,36 @@ class manager {
     public function get_exams_for_course ($courseid, $sort = 'timefrom DESC') {
         global $DB;
 
-        $recs = $DB->get_records(
-            'local_exammode',
-            array('courseid' => $courseid),
-            $sort
+        $sql = "SELECT em.* "
+                . "FROM {local_exammode} em "
+                . "WHERE courseid = :courseid "
+                . "      AND state != :deleted ";
+
+        $recs = $DB->get_records_sql(
+            $sql,
+            array('courseid' => $courseid,
+                  'deleted' => objects\exammode::STATE_TODELETE
+            )
         );
 
+        return array_map(function($r) {
+            return objects\exammode::to_exammode($r);
+        }, $recs);
+    }
+
+    /**
+     * Gets exammodes marked to be deleted.
+     *
+     * @global \moodle_database $DB
+     *
+     */
+    public function get_exammodes_to_delete() {
+        global $DB;
+
+        $recs = $DB->get_records(
+                'local_exammode',
+                array('state' => objects\exammode::STATE_TODELETE)
+        );
         return array_map(function($r) {
             return objects\exammode::to_exammode($r);
         }, $recs);
@@ -151,26 +175,73 @@ class manager {
      * @global \moodle_database $DB
      * @return objects\exammode[]
      */
-    public function get_courses_in_exammode () {
+    public function get_courses_in_exammode() {
 
         global $DB;
 
-        $sql = "SELECT id, courseid, timefrom, timeto "
+        $now = time();
+
+        $sql = "SELECT id, courseid, timefrom, timeto, state "
                 . "FROM {local_exammode} em "
-                . "WHERE em.timefrom <= :from "
-                . "      AND em.timeto >= :to";
+                . "WHERE :from >= em.timefrom "
+                . "      AND :to <= em.timeto "
+                . "      AND em.state != :state_todelete";
 
         $dbrecs = $DB->get_records_sql(
                 $sql,
                 array(
-                    'from' => time() - self::GRACE_TIME,
-                    'to' => time() + self::GRACE_TIME
+                    'from' => $now + self::GRACE_TIME,
+                    'to' => $now - self::GRACE_TIME,
+                    'state_todelete' => objects\exammode::STATE_TODELETE
                 )
         );
 
         return array_map(function($dbrec) {
             return objects\exammode::to_exammode($dbrec);
         }, $dbrecs);
+    }
+
+    /**
+     * Gets the courses that should be in exammode now.
+     *
+     * @global \moodle_database $DB
+     * @return objects\exammode[]
+     */
+    public function get_finished_exammodes() {
+        global $DB;
+
+        $sql = "SELECT id, courseid, timefrom, timeto, state "
+                . "FROM {local_exammode} em "
+                . "WHERE em.timeto < :to";
+
+        $dbrecs = $DB->get_records_sql(
+                $sql,
+                array(
+                    'to' => time() - self::GRACE_TIME
+                )
+        );
+
+        return array_map(function($dbrec) {
+            return objects\exammode::to_exammode($dbrec);
+        }, $dbrecs);
+    }
+
+    /**
+     * Returns potential users in exammode for the give course.
+     *
+     * @param objects\exammode $em the exammode
+     * @return exammode_user[]
+     */
+    public function get_potential_users_for_exammode($em) {
+        $context = \context_course::instance($em->get_courseid());
+        $users = \get_users_by_capability(
+                $context,
+                'local/exammode:enterexammode',
+                'u.id'
+        );
+        return array_map(function($u) use ($em) {
+            return new objects\exammode_user(null, $em->get_id(), $u->id);
+        }, $users);
     }
 
     /**
@@ -186,7 +257,7 @@ class manager {
 
         $time = time();
 
-        $sql = "SELECT id, courseid, timefrom, timeto "
+        $sql = "SELECT em.* "
                 . "FROM {local_exammode} em "
                 . "WHERE courseid = :courseid "
                 . "      AND em.timefrom <= :from "
@@ -241,12 +312,23 @@ class manager {
      * Gets an array of exammode_user of users that are currently in exammode.
      *
      * @global \moodle_database $DB
+     * @param int $courseid the courseid.
      * @return objects\exammode_user[]
      */
-    public function get_users_in_exammode() {
+    public function get_users_in_exammode($courseid = null) {
         global $DB;
+        $params = array();
 
-        $dbrecs = $DB->get_records('local_exammode_user');
+        $sql = "SELECT emu.* "
+                . "FROM {local_exammode} em"
+                . "     JOIN {local_exammode_user} emu ON emu.exammodeid = em.id ";
+
+        if ($courseid !== null) {
+            $params['courseid'] = $courseid;
+            $sql .= "WHERE em.courseid = :courseid";
+        }
+
+        $dbrecs = $DB->get_records_sql($sql, $params);
         return objects\exammode_user::get_from_db($dbrecs);
     }
 
@@ -377,4 +459,6 @@ class manager {
        global $DB;
        return $DB->record_exists('local_exammode_user', array('userid' => $userid));
     }
+
+
 }

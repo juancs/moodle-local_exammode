@@ -30,10 +30,28 @@ defined('MOODLE_INTERNAL') || die();
 
 class exammode {
 
+    const STATE_PENDING = 0;
+    const STATE_CONFIGURING = 1;
+    const STATE_WORKING = 2;
+    const STATE_UNCONFIGURING = 3;
+    const STATE_FINISHED = 4;
+
+    const STATE_TODELETE = 5;
+
+    private static $valid_states = array(
+        self::STATE_PENDING,
+        self::STATE_CONFIGURING,
+        self::STATE_WORKING,
+        self::STATE_UNCONFIGURING,
+        self::STATE_FINISHED,
+        self::STATE_TODELETE
+    );
+
     private $id;
     private $courseid;
     private $timefrom;
     private $timeto;
+    private $state;
 
     /**
      * Given a dbrecord from local_exammode gets an instance of exammode.
@@ -43,15 +61,21 @@ class exammode {
      */
     public static function to_exammode($dbrec) {
         return new self(
-            $dbrec->id, $dbrec->courseid, $dbrec->timefrom, $dbrec->timeto
+            $dbrec->id, $dbrec->courseid, $dbrec->timefrom, $dbrec->timeto, $dbrec->state
         );
     }
 
-    public function __construct($id, $courseid, $timefrom, $timeto) {
+    public function __construct($id, $courseid, $timefrom, $timeto, $state = self::STATE_PENDING) {
+
+        if (!$this->state_is_valid($state)) {
+            throw new \local_exammode\exceptions\invalid_state_exception($state);
+        }
+
         $this->id = ($id === null) ? null : (int) $id;
         $this->courseid = (int) $courseid;
         $this->timefrom = (int) $timefrom;
         $this->timeto = (int) $timeto;
+        $this->state = (int) $state;
     }
 
     public function to_db_record() {
@@ -60,7 +84,12 @@ class exammode {
         $ret->courseid = (int) $this->courseid;
         $ret->timefrom = (int) $this->timefrom;
         $ret->timeto = (int) $this->timeto;
+        $ret->state = (int) $this->state;
         return $ret;
+    }
+
+    private function state_is_valid($state) {
+        return in_array($state, self::$valid_states);
     }
 
     public function get_id() {
@@ -93,5 +122,16 @@ class exammode {
 
     function set_to($to) {
         $this->timeto = $to;
+    }
+
+    public function get_state() {
+        return $this->state;
+    }
+
+    public function set_state($state) {
+        if (!$this->state_is_valid($state)) {
+            throw new \local_exammode\exceptions\invalid_state_exception($state);
+        }
+        $this->state = $state;
     }
 }

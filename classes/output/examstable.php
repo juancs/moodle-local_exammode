@@ -28,6 +28,8 @@ namespace local_exammode\output;
 
 defined('MOODLE_INTERNAL') || die();
 
+use local_exammode\objects\exammode;
+
 require_once($CFG->libdir . '/tablelib.php');
 
 class examstable extends \flexible_table implements \renderable {
@@ -45,6 +47,7 @@ class examstable extends \flexible_table implements \renderable {
 
         $this->define_columns(
             array(
+                'state',
                 'date',
                 'timefrom',
                 'timeto',
@@ -53,6 +56,7 @@ class examstable extends \flexible_table implements \renderable {
         );
         $this->define_headers(
             array(
+                get_string('state', 'local_exammode'),
                 get_string('date'),
                 get_string('timefrom', 'local_exammode'),
                 get_string('timeto', 'local_exammode'),
@@ -109,5 +113,37 @@ class examstable extends \flexible_table implements \renderable {
             new \pix_icon('i/delete', get_string('delete'))
         );
         return $ret;
+    }
+    /**
+     * The state of the exammode.
+     *
+     * @param \local_exammode\objects\exammode $data
+     */
+    protected function col_state($data) {
+
+        switch ($data->get_state()) {
+            case exammode::STATE_CONFIGURING:
+                $state = get_string('state_configuring', 'local_exammode');
+                $state_desc = get_string('state_configuringdesc', 'local_exammode');
+                break;
+            case exammode::STATE_FINISHED:
+                $state = get_string('state_finished', 'local_exammode');
+                $state_desc = get_string('state_finisheddesc', 'local_exammode');
+                break;
+            case exammode::STATE_PENDING:
+                $state = get_string('state_pending', 'local_exammode');
+                $state_desc = get_string('state_pendingdesc', 'local_exammode');
+                break;
+            case exammode::STATE_UNCONFIGURING:
+                $state = get_string('state_unconfiguring', 'local_exammode');
+                $state_desc = get_string('state_unconfiguringdesc', 'local_exammode');
+                break;
+            case exammode::STATE_WORKING:
+                $state = get_string('state_working', 'local_exammode');
+                $state_desc = get_string('state_workingdesc', 'local_exammode');
+                break;
+        }
+
+        return \html_writer::tag('p', $state, array('title' => $state_desc));
     }
 }

@@ -62,16 +62,21 @@ if ($action === 'new' || $action === 'edit') {
     } else if ($data = $newpage->get_data()) {
         // Data is already validated here, so timefrom and duration are within
         // the same day.
-        $exam = new local_exammode\objects\exammode(
-                $examid,
-                $courseid,
-                $data->timefrom,
-                $data->timefrom + $data->duration
-        );
 
         if ($action === 'new') {
+            $exam = new local_exammode\objects\exammode(
+                    $examid,
+                    $courseid,
+                    $data->timefrom,
+                    $data->timefrom + $data->duration,
+                    local_exammode\objects\exammode::STATE_PENDING
+            );
+
             $success = $manager->add_exam($exam);
         } else {
+            $exam = $manager->get_exam($examid);
+            $exam->set_from($data->timefrom);
+            $exam->set_to($data->timefrom + $data->duration);
             $success = $manager->update_exam($exam);
         }
 
@@ -136,8 +141,10 @@ if ($action === 'new' || $action === 'edit') {
     }
 
     require_sesskey();
-    // TODO: delete_exam has to unassign the system role defined.
-    $manager->delete_exam($examid);
+    // Mark the exammode to be deleted.
+    $exam = $manager->get_exam($examid);
+    $exam->set_state(local_exammode\objects\exammode::STATE_TODELETE);
+    $manager->update_exam($exam);
 
     redirect(
             new \moodle_url('/local/exammode/manage.php', array('courseid' => $courseid)),

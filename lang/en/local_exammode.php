@@ -65,3 +65,18 @@ $string['nauthz_exammode'] = 'You\'re not authorized to access {$a} '
         . 'because you\'re in exammode now. This means that you cannot access '
 	. 'all funcionality in this site until this mode ends.';
 
+$string['state'] = 'State';
+$string['state_pending'] = 'Pending';
+$string['state_pendingdesc'] = 'The exammode is pending to be applied.';
+$string['state_configuring'] = 'Configuring';
+$string['state_configuringdesc'] = 'The exammode is being configured now.';
+$string['state_working'] = 'Working';
+$string['state_workingdesc'] = 'The exammode has been fully configured and working now.';
+$string['state_unconfiguring'] = 'Unconfiguring';
+$string['state_unconfiguringdesc'] = 'The exammode is being unconfigured now.';
+$string['state_finished'] = 'Finished';
+$string['state_finisheddesc'] = 'The exammode has finished.';
+
+$string['error_invalid_state'] = 'Tried to set an invalid state for the exammode: {$a}';
+
+$string['update_exammode_state_task'] = 'Update the state of exammodes';
