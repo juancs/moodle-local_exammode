@@ -69,7 +69,13 @@ class update_exammode_users extends \core\task\scheduled_task {
                 }
             }
             if (!$found) {
-                $manager->put_user_in_exammode($au);
+               // OJO. Es necesario ejecutar my_copy_page para asegurar que existen las
+               // instancias de bloque en la tabl block_instances para el dashboard.
+                require_once($CFG->dirroot . '/my/lib.php');
+                if ( \my_copy_page($emu->get_userid()) !== false) {
+                    $manager->put_user_in_exammode($au);
+                }
+                
             }
         }
 

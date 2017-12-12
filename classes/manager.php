@@ -291,7 +291,7 @@ class manager {
      * @return int[]
      */
     private function get_prohibited_dashboard_blocks(objects\exammode_user $emu) {
-        global $DB;
+        global $DB, $CFG;
 
         $sql = "SELECT id "
                 . "FROM {block_instances} bi "
@@ -320,6 +320,7 @@ class manager {
 
         // Assign the blocks role.
         $blockinstances = $this->get_prohibited_dashboard_blocks($emu);
+
         foreach ($blockinstances as $biid) {
             $context = \context_block::instance($biid);
             \role_assign(
@@ -374,7 +375,6 @@ class manager {
      */
     public function is_user_in_exammode ($userid) {
        global $DB;
-       return true;
        return $DB->record_exists('local_exammode_user', array('userid' => $userid));
     }
 }
