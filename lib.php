@@ -47,3 +47,4 @@ function local_exammode_extend_navigation_course(navigation_node $navigation, $c
         $cat->add_node($node);
     }
 }
+

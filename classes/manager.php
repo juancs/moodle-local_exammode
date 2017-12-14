@@ -235,6 +235,38 @@ class manager {
         $dbrecs = $DB->get_records_sql($sql);
         return objects\exammode_user::get_from_db($dbrecs);
     }
+    
+    /**
+     * Return true if user is in exammode
+     *
+     * @param string $courseId
+     * @param string $userId
+     * @global \moodle_database $DB
+     * @return boolean 
+     */
+    public function is_user_in_exammode($courseId, $userId) {
+        global $DB;
+        
+        
+        $sql = "SELECT count(em.id) as nids "
+             . "FROM {local_exammode} em "
+             . "  INNER JOIN {local_exammode_user} eu ON em.id = eu.exammodeid "
+             . "WHERE "
+             . "  em.courseid = :courseid "
+             . "  AND eu.userid = :userid "
+             . "";
+
+         $dbrecs = $DB->get_record_sql($sql, array(
+                         'userid'    => $userId, 
+                         'courseid'  => $courseId));         
+
+         if ( intval($dbrecs->nids) > 0 ){
+             return true;
+         } else {
+             return false;
+         }
+
+    }
 
     /**
      * Puts a user in exammode.
