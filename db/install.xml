@@ -10,6 +10,7 @@
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timefrom" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The time when the exam mode must start."/>
         <FIELD NAME="timeto" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="A unix timestamp representing the end datetime when the exam mode should finish."/>
+        <FIELD NAME="state" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The state of the exammode."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

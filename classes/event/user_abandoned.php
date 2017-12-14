@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,23 +16,20 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Tasks declaration.
+ * An event triggered when a user leaves exammode.
  *
- * @package    local
- * @subpackage exammode
+ * @package    local_lpi
  * @copyright  2017 Universitat Jaume I (http://www.uji.es/)
  * @author     Juan Segarra Montesinos <juan.segarra@uji.es>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later2
  */
 
-$tasks = array(
-    array(
-        'classname' => 'local_exammode\task\update_exammode_users',
-        'blocking' => 0,
-        'minute' => '*/1',
-        'hour' => '*',
-        'day' => '*',
-        'dayofweek' => '*',
-        'month' => '*'
-    )
-);
+namespace local_exammode\event;
+
+class user_abandoned extends user_event {
+    protected function init() {
+        $this->data['crud'] = 'd';
+        $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
+        $this->data['objecttable'] = 'local_exammode_user';
+    }
+}

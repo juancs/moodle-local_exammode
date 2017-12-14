@@ -17,7 +17,7 @@
 /**
  * Wrapper for plugin global configuration.
  *
- * @package    local_lpi
+ * @package    local
  * @copyright  2017 Universitat Jaume I (http://www.uji.es/)
  * @author     Juan Segarra Montesinos <juan.segarra@uji.es>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later2
@@ -26,6 +26,11 @@
 namespace local_exammode;
 
 class config {
+
+    /**
+     * The singleton instance.
+     * @var config
+     */
     private static $instance;
 
     private $config;

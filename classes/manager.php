@@ -18,7 +18,8 @@
  * An interface with the underlying model. Dependant modules should use this
  * class.
  *
- * @package    local/exammode
+ * @package    local
+ * @subpackage exammode
  * @copyright  2017 Universitat Jaume I (https://www.uji.es/)
  * @author     Juan Segarra Montesinos <juan.segarra@uji.es>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -30,6 +31,9 @@ defined('MOODLE_INTERNAL') || die();
 
 class manager {
 
+    /**
+     * Grace time in seconds.
+     */
     const GRACE_TIME = 10 * 60;
 
     /**
@@ -85,7 +89,7 @@ class manager {
     }
 
     /**
-     * Gets the exams scheduled for course.
+     * Gets the exams scheduled for course. Excludes STATE_TODELETE courses.
      *
      * @global \moodle_database $DB
      * @param int $courseid
@@ -93,12 +97,37 @@ class manager {
     public function get_exams_for_course ($courseid, $sort = 'timefrom DESC') {
         global $DB;
 
-        $recs = $DB->get_records(
-            'local_exammode',
-            array('courseid' => $courseid),
-            $sort
+        $sql = "SELECT em.* "
+                . "FROM {local_exammode} em "
+                . "WHERE courseid = :courseid "
+                . "      AND state != :deleted "
+                . "ORDER BY $sort";
+
+        $recs = $DB->get_records_sql(
+            $sql,
+            array('courseid' => $courseid,
+                  'deleted' => objects\exammode::STATE_TODELETE
+            )
         );
 
+        return array_map(function($r) {
+            return objects\exammode::to_exammode($r);
+        }, $recs);
+    }
+
+    /**
+     * Gets exammodes marked to be deleted.
+     *
+     * @global \moodle_database $DB
+     *
+     */
+    public function get_exammodes_to_delete() {
+        global $DB;
+
+        $recs = $DB->get_records(
+                'local_exammode',
+                array('state' => objects\exammode::STATE_TODELETE)
+        );
         return array_map(function($r) {
             return objects\exammode::to_exammode($r);
         }, $recs);
@@ -147,54 +176,115 @@ class manager {
      * @global \moodle_database $DB
      * @return objects\exammode[]
      */
-    public function get_courses_in_exammode () {
+    public function get_courses_in_exammode() {
 
         global $DB;
 
-        $sql = "SELECT id, courseid, timefrom, timeto "
-                . "FROM {local_exammode} em "
-                . "WHERE em.timefrom <= :from "
-                . "      AND em.timeto >= :to";
+        $now = time();
 
-        $dbrecs = $DB->get_records_sql($sql, array('from' => time(), 'to' => time()));
+        $sql = "SELECT id, courseid, timefrom, timeto, state "
+                . "FROM {local_exammode} em "
+                . "WHERE :from >= em.timefrom "
+                . "      AND :to <= em.timeto "
+                . "      AND em.state != :state_todelete";
+
+        $dbrecs = $DB->get_records_sql(
+                $sql,
+                array(
+                    'from' => $now + self::GRACE_TIME,
+                    'to' => $now - self::GRACE_TIME,
+                    'state_todelete' => objects\exammode::STATE_TODELETE
+                )
+        );
 
         return array_map(function($dbrec) {
             return objects\exammode::to_exammode($dbrec);
         }, $dbrecs);
     }
-    
+
+    /**
+     * Gets the exammodes of courses that should be finished. DO NOT FILTER
+     * STATE_TODELETE exammodes because it's necessary to remove users from the
+     * update_exammode_users task.
+     *
+     * @global \moodle_database $DB
+     * @return objects\exammode[]
+     */
+    public function get_finished_exammodes() {
+        global $DB;
+
+        $sql = "SELECT id, courseid, timefrom, timeto, state "
+                . "FROM {local_exammode} em "
+                . "WHERE em.timeto < :to";
+
+        $dbrecs = $DB->get_records_sql(
+                $sql,
+                array(
+                    'to' => time() - self::GRACE_TIME
+                )
+        );
+
+        return array_map(function($dbrec) {
+            return objects\exammode::to_exammode($dbrec);
+        }, $dbrecs);
+    }
+
+    /**
+     * Returns potential users in exammode for the give course.
+     *
+     * @param objects\exammode $em the exammode
+     * @return exammode_user[]
+     */
+    public function get_potential_users_for_exammode($em) {
+        $context = \context_course::instance($em->get_courseid());
+        $users = \get_users_by_capability(
+                $context,
+                'local/exammode:enterexammode',
+                'u.id'
+        );
+        return array_map(function($u) use ($em) {
+            return new objects\exammode_user(null, $em->get_id(), $u->id);
+        }, $users);
+    }
+
     /**
      * Comprobar si el curso están en exammode.
      *
      * @param string $courseid
      * @global \moodle_database $DB
-     * @return boolean
+     * @return objects\exammode|null
      */
     public function is_course_in_exammode ($courseId) {
 
         global $DB;
 
-        $sql = "SELECT id, courseid, timefrom, timeto "
+        $time = time();
+
+        $sql = "SELECT em.* "
                 . "FROM {local_exammode} em "
                 . "WHERE courseid = :courseid "
                 . "      AND em.timefrom <= :from "
                 . "      AND em.timeto >= :to";
 
-        $dbrec = $DB->get_record_sql($sql, array('courseid' => $courseId, 'from' => time(), 'to' => time()));
+        $dbrec = $DB->get_record_sql(
+                $sql,
+                array(
+                    'courseid' => $courseId,
+                    'from' => $time + self::GRACE_TIME,
+                    'to' => $time - self::GRACE_TIME
+                )
+        );
 
         if (!$dbrec) {
             return null;
         }
-        else {
-            return objects\exammode::to_exammode($dbrec);
-        }
 
-        
-        
+        return objects\exammode::to_exammode($dbrec);
     }
 
     /**
-     * Gets an array of userid that should be in exammode now.
+     * Gets an array of userid that should be in exammode now (ie. potential
+     * users in exammode).
      *
      * @global \moodle_database $DB
      * @return objects\exammode_user[]
@@ -202,6 +292,7 @@ class manager {
     public function get_all_users_in_exammode() {
         global $DB;
 
+        // TODO: esta función debería llamarse get_potential_users_in_exammode()
         $users = array();
         $exammode = $this->get_courses_in_exammode();
         foreach ($exammode as $em) {
@@ -224,15 +315,23 @@ class manager {
      * Gets an array of exammode_user of users that are currently in exammode.
      *
      * @global \moodle_database $DB
+     * @param int $courseid the courseid.
      * @return objects\exammode_user[]
      */
-    public function get_users_in_exammode() {
+    public function get_users_in_exammode($courseid = null) {
         global $DB;
+        $params = array();
 
-        $sql = "SELECT * "
-                . "FROM {local_exammode_user} emu";
+        $sql = "SELECT emu.* "
+                . "FROM {local_exammode} em"
+                . "     JOIN {local_exammode_user} emu ON emu.exammodeid = em.id ";
 
-        $dbrecs = $DB->get_records_sql($sql);
+        if ($courseid !== null) {
+            $params['courseid'] = $courseid;
+            $sql .= "WHERE em.courseid = :courseid";
+        }
+
+        $dbrecs = $DB->get_records_sql($sql, $params);
         return objects\exammode_user::get_from_db($dbrecs);
     }
     
@@ -276,9 +375,14 @@ class manager {
      */
     public function put_user_in_exammode(objects\exammode_user $emu) {
         global $DB;
+
+        $trx = $DB->start_delegated_transaction();
+
         $this->configure_moodle_exammode($emu);
         $id = $DB->insert_record('local_exammode_user', $emu->to_db());
         $emu->set_id($id);
+
+        $trx->allow_commit();
     }
 
     /**
@@ -304,7 +408,7 @@ class manager {
      * @return int[]
      */
     private function get_prohibited_dashboard_blocks(objects\exammode_user $emu) {
-        global $DB;
+        global $DB, $CFG;
 
         $sql = "SELECT id "
                 . "FROM {block_instances} bi "
@@ -326,12 +430,14 @@ class manager {
 
     /**
      * Performs the actions to put moodle into exammode for the user specified.
+     *
      * @param \local_exammode\objects\exammode_user $emu
      */
     private function configure_moodle_exammode (objects\exammode_user $emu) {
 
-        // Assign the block role.
+        // Assign the blocks role.
         $blockinstances = $this->get_prohibited_dashboard_blocks($emu);
+
         foreach ($blockinstances as $biid) {
             $context = \context_block::instance($biid);
             \role_assign(
@@ -377,4 +483,17 @@ class manager {
                 'local_exammode'
         );
     }
+
+    /**
+     * Determines if a user is in exammode now in any course.
+     *
+     * @global \moodle_database $DB
+     * @param int $userid
+     */
+    public function is_user_in_exammode ($userid) {
+       global $DB;
+       return $DB->record_exists('local_exammode_user', array('userid' => $userid));
+    }
+
+
 }

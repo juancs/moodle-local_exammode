@@ -17,7 +17,8 @@
 /**
  * Module stuff.
  *
- * @package    local_exammode
+ * @package    local
+ * @subpackage exammode
  * @copyright  2017 Universitat Jaume I (https://www.uji.es/)
  * @author     Juan Segarra Montesinos <juan.segarra@uji.es>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,6 +27,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_exammode';
-$plugin->version = 2017111406;
+$plugin->version = 2017121200;
 $plugin->maturity = MATURITY_ALPHA;
 $plugin->requires = 2017051500;

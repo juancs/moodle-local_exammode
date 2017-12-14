@@ -17,7 +17,8 @@
 /**
  * Capabilities.
  *
- * @package    local_exammode
+ * @package    local
+ * @subpackage exammode
  * @copyright  2017 Universitat Jaume I (https://www.uji.es/)
  * @author     Juan Segarra Montesinos <juan.segarra@uji.es>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,6 +27,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
+    // Allows a user to configure exammode for a course.
     'local/exammode:manage' => array(
         'riskbitmask' => RISK_DATALOSS,
         'captype' => 'write',
@@ -36,6 +38,7 @@ $capabilities = array(
             'student' => CAP_PREVENT
         )
     ),
+    // Allows a user to be put in exam mode.
     'local/exammode:enterexammode' => array(
         'riskbitmask' => RISK_DATALOSS,
         'captype' => 'write',

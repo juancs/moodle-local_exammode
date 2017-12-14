@@ -15,36 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Output exammode.
+ * Just returns nothing for message_popup_get_popup_notifications and
+ * core_message_data_for_messagearea_conversations.
  *
- * @package    local
- * @subpackage exammode
+ * @package    local/exammode
  * @copyright  2017 Universitat Jaume I (https://www.uji.es/)
  * @author     Juan Segarra Montesinos <juan.segarra@uji.es>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_exammode\output;
+$info = optional_param('info', null, PARAM_RAW);
 
-defined('MOODLE_INTERNAL') || die();
-
-class exammode implements \templatable, \renderable {
-    
-    /**
-     * The exammode to show.
-     *
-     * @var \local_exammode\objects\exammode 
-     */
-    private $exammode;
-
-    public function __construct(\local_exammode\objects\exammode $exammode) {
-        $this->exammode = $exammode;
-    }
-    public function export_for_template(\renderer_base $output) {
-        return array(
-            'timefrom' => usergetdate($this->exammode->get_from()),
-            'timeto' => usergetdate($this->exammode->get_to()),
-            'actions' => '1 2 3'
-        );
-    }
+$functions_to_check = array(
+    'message_popup_get_popup_notifications',
+    'core_message_data_for_messagearea_conversations'
+);
+if (in_array($info, $functions_to_check)) {
+    \local_exammode\custom_scripts::exammode_check_for_ajax_script();
 }

@@ -15,36 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Output exammode.
+ * Exception thrown when trying to set an unrecognised state to an exammode
+ * instance.
  *
- * @package    local
- * @subpackage exammode
- * @copyright  2017 Universitat Jaume I (https://www.uji.es/)
+ * @package    local_lpi
+ * @copyright  2017 Universitat Jaume I (http://www.uji.es/)
  * @author     Juan Segarra Montesinos <juan.segarra@uji.es>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later2
  */
 
-namespace local_exammode\output;
+namespace local_exammode\exceptions;
 
 defined('MOODLE_INTERNAL') || die();
 
-class exammode implements \templatable, \renderable {
-    
-    /**
-     * The exammode to show.
-     *
-     * @var \local_exammode\objects\exammode 
-     */
-    private $exammode;
+class invalid_state_exception extends \moodle_exception {
+    private $state;
 
-    public function __construct(\local_exammode\objects\exammode $exammode) {
-        $this->exammode = $exammode;
-    }
-    public function export_for_template(\renderer_base $output) {
-        return array(
-            'timefrom' => usergetdate($this->exammode->get_from()),
-            'timeto' => usergetdate($this->exammode->get_to()),
-            'actions' => '1 2 3'
-        );
+    public function __construct($state) {
+        $this->state = $state;
+        parent::__construct('error_invalid_state', 'local_exammode', '', $state);
     }
 }

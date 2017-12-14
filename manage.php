@@ -17,7 +17,8 @@
 /**
  * Manage exam mode for a course.
  *
- * @package    local_exammode
+ * @package    local
+ * @subpackage exammode
  * @copyright  2017 Universitat Jaume I (https://www.uji.es/)
  * @author     Juan Segarra Montesinos <juan.segarra@uji.es>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -61,16 +62,21 @@ if ($action === 'new' || $action === 'edit') {
     } else if ($data = $newpage->get_data()) {
         // Data is already validated here, so timefrom and duration are within
         // the same day.
-        $exam = new local_exammode\objects\exammode(
-                $examid,
-                $courseid,
-                $data->timefrom,
-                $data->timefrom + $data->duration
-        );
 
         if ($action === 'new') {
+            $exam = new local_exammode\objects\exammode(
+                    $examid,
+                    $courseid,
+                    $data->timefrom,
+                    $data->timefrom + $data->duration,
+                    local_exammode\objects\exammode::STATE_PENDING
+            );
+
             $success = $manager->add_exam($exam);
         } else {
+            $exam = $manager->get_exam($examid);
+            $exam->set_from($data->timefrom);
+            $exam->set_to($data->timefrom + $data->duration);
             $success = $manager->update_exam($exam);
         }
 
@@ -82,6 +88,13 @@ if ($action === 'new' || $action === 'edit') {
                 \core\output\notification::NOTIFY_ERROR
             );
         } else {
+
+            if ($action == 'edit') {
+                $event = local_exammode\event\exam_updated::create_from_exammode($exam);
+            } else if ($action == 'new') {
+                $event = local_exammode\event\exam_created::create_from_exammode($exam);
+            }
+            $event->trigger();
 
             $a = new \stdClass();
             $a->day = userdate($data->timefrom, get_string('strftimedate', 'langconfig'));
@@ -113,10 +126,12 @@ if ($action === 'new' || $action === 'edit') {
     }
 
 } else if ($action === 'delete') {
-    echo $output->header();
+
     $examid = required_param('examid', PARAM_INT);
     $sesskey = optional_param('sesskey', null, PARAM_RAW);
     if (!$sesskey) {
+        echo $output->header();
+
         echo $output->confirm(
             get_string('confirmdelete', 'local_exammode'),
             new \moodle_url(
@@ -133,8 +148,18 @@ if ($action === 'new' || $action === 'edit') {
     }
 
     require_sesskey();
-    // TODO: delete_exam has to unassign the system role defined.
-    $manager->delete_exam($examid);
+    // Mark the exammode to be deleted.
+    $exam = $manager->get_exam($examid);
+    $exam->set_state(local_exammode\objects\exammode::STATE_TODELETE);
+    $manager->update_exam($exam);
+
+    redirect(
+            new \moodle_url('/local/exammode/manage.php', array('courseid' => $courseid)),
+            get_string('deleteexamsuccess', 'local_exammode'),
+            5,
+            \core\output\notification::NOTIFY_SUCCESS
+    );
+
 } else {
     echo $output->header();
 }

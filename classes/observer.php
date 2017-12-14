@@ -26,18 +26,20 @@
 defined('MOODLE_INTERNAL') || die();
 
 class local_exammode_observer {
-
-    static function local_exammode_user_enrolment_created(\core\event\user_enrolment_created $event) {
-
+    public static function local_exammode_user_enrolment_created(\core\event\user_enrolment_created $event) {
+        /*
         $manager = local_exammode\manager::get_instance();
-        
+
         $em = $manager->is_course_in_exammode($event->courseid);
-
-        if ( $em != null ) {   
-            $emu = new \local_exammode\objects\exammode_user (null, $em->get_id(), $event->relateduserid);
-            $manager->put_user_in_exammode($emu);          
+        if ( $em != null ) {
+            $emu = new \local_exammode\objects\exammode_user(
+                    null,
+                    $em->get_id(),
+                    $event->relateduserid
+            );
+            $manager->put_user_in_exammode($emu);
         }
-
+         * 
+         */
     }
 }
-
