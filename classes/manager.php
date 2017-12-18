@@ -334,37 +334,42 @@ class manager {
         $dbrecs = $DB->get_records_sql($sql, $params);
         return objects\exammode_user::get_from_db($dbrecs);
     }
-    
+
+    /**
+     * Determines if a user is in exammode now in any course.
+     *
+     * @global \moodle_database $DB
+     * @param int $userid
+     */
+    public function is_user_in_exammode ($userid) {
+       global $DB;
+       return $DB->record_exists('local_exammode_user', array('userid' => $userid));
+    }
+
     /**
      * Return true if user is in exammode
      *
      * @param string $courseId
      * @param string $userId
      * @global \moodle_database $DB
-     * @return boolean 
+     * @return boolean
      */
-    public function is_user_in_exammode($courseId, $userId) {
+    public function is_user_in_exammode_at_course($courseid, $userid) {
+
         global $DB;
-        
-        
+
         $sql = "SELECT count(em.id) as nids "
              . "FROM {local_exammode} em "
              . "  INNER JOIN {local_exammode_user} eu ON em.id = eu.exammodeid "
-             . "WHERE "
-             . "  em.courseid = :courseid "
-             . "  AND eu.userid = :userid "
-             . "";
+             . "WHERE em.courseid = :courseid "
+             . "      AND eu.userid = :userid";
 
-         $dbrecs = $DB->get_record_sql($sql, array(
-                         'userid'    => $userId, 
-                         'courseid'  => $courseId));         
+        $nids = $DB->count_records_sql($sql, array(
+                'userid'    => $userid,
+                'courseid'  => $courseid)
+        );
 
-         if ( intval($dbrecs->nids) > 0 ){
-             return true;
-         } else {
-             return false;
-         }
-
+        return intval($nids) > 0;
     }
 
     /**
