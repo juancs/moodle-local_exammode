@@ -27,6 +27,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_exammode';
-$plugin->version = 2017121200;
-$plugin->maturity = MATURITY_ALPHA;
+$plugin->version = 2017121800;
+$plugin->maturity = MATURITY_BETA;
 $plugin->requires = 2017051500;
